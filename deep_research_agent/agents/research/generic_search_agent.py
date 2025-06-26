@@ -1,0 +1,51 @@
+import asyncio
+from strands import Agent, tool
+from deep_research_agent.agents.research.tools import websearch
+from typing import Optional
+
+
+@tool
+def generic_search(query: str, agent: Optional[Agent] = None) -> str:
+    """
+    Performs a generic search for foundational knowledge.
+    
+    Args:
+        query: The search query
+        agent: Shared Agent instance (if None, creates a new one)
+    """
+    print(f"Executing Generic Search with query: {query}")
+    
+    if agent is None:
+        from strands.models import BedrockModel
+        model = BedrockModel(
+            model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+            region_name="us-east-1"
+        )
+        agent = Agent(model=model)
+    
+    # Create a search agent with the websearch tool
+    search_agent = Agent(
+        model=agent.model,
+        tools=[websearch],
+        system_prompt=(
+            "You are a Generic Search Agent. Your task is to perform a web search based on a given query "
+            "to find foundational knowledge on a topic. Synthesize the search results into a concise summary."
+        )
+    )
+    
+    # Call the agent and return its response
+    result = search_agent(f"Search for information about: {query}")
+    return str(result)
+
+
+async def generic_search_async(query: str, agent: Optional[Agent] = None) -> str:
+    """
+    Async version of generic_search for parallel execution.
+    
+    Args:
+        query: The search query
+        agent: Shared Agent instance (if None, creates a new one)
+    """
+    # Run the synchronous function in a thread pool to avoid blocking
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, generic_search, query, agent)
