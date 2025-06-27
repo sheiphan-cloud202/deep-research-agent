@@ -1,11 +1,12 @@
 from strands import Agent
+from typing import Optional
 from deep_research_agent.agents.base_agent import BaseAgent
 from deep_research_agent.schemas import EvaluationScore
 
 
 class MarketViabilityAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Market Viability Agent. Your task is to evaluate a given idea and provide a score from 1-10 "
             "on its market viability and business potential. You must also provide a justification for your score. "

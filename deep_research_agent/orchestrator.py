@@ -17,16 +17,89 @@ from deep_research_agent.agents.ideation.devils_advocate_agent import DevilsAdvo
 from deep_research_agent.agents.evaluation.evaluation_coordinator_agent import EvaluationCoordinatorAgent
 from deep_research_agent.agents.evaluation.ranking_agent import RankingAgent
 from deep_research_agent.agents.reporting.report_synthesizer_agent import ReportSynthesizerAgent
+from deep_research_agent.agent_factory import AgentFactory
 
 
 class OrchestratorAgent:
     def __init__(self):
-        # Create a BedrockModel with explicit region specification
-        model = BedrockModel(
-            model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-            region_name="us-east-1"  # Explicitly specify the region
-        )
-        self._agent = Agent(model=model)
+        self._agent = AgentFactory.get_default_agent()
+
+    def generate_clarifying_questions(self, conversation_history: list) -> str:
+        """
+        Generate clarifying questions based on the conversation history.
+        """
+        clarifier_agent = ClarifierAgent()
+        
+        # Use the latest entry in conversation history for context
+        latest_context = conversation_history[-1] if conversation_history else ""
+        full_context = " ".join(conversation_history)
+        
+        return clarifier_agent.execute_interactive(latest_context, full_context)
+
+    def run_workflow_from_conversation(self, conversation_history: list):
+        """
+        Run the complete workflow using conversation history instead of separate prompts.
+        """
+        # Summarize the conversation first
+        summarizer_agent = ConversationSummarizerAgent()
+        summary = summarizer_agent.execute(conversation_history)
+        print(f"Conversation Summary:\n{summary}\n")
+
+        # Enhance the summarized conversation
+        enhancer_agent = QueryEnhancerAgent()
+        enhanced_prompt = enhancer_agent.execute(summary)
+        print(f"Enhanced Prompt:\n{enhanced_prompt}\n")
+
+        # Create mission brief from enhanced prompt
+        understanding_agent = QueryUnderstandingAgent(model_id="anthropic.claude-3-5-sonnet-20240620-v1:0")
+        mission_brief = understanding_agent.execute(enhanced_prompt)
+        print(f"Mission Brief:\n{mission_brief.model_dump_json(indent=2)}\n")
+
+        # Continue with the rest of the workflow
+        return self._run_research_workflow(mission_brief)
+
+    def _run_research_workflow(self, mission_brief: MissionBrief):
+        """
+        Internal method to run the research workflow after mission brief is created.
+        """
+        # 2. Comprehensive Research Phase - Now Running in Parallel!
+        research_results = asyncio.run(self.run_research_agents_parallel(mission_brief))
+        generic_report, business_report, domain_report, trend_report, personas = research_results
+
+        search_summarizer_agent = SearchSummarizerAgent()
+        creative_brief = search_summarizer_agent.execute([
+            generic_report, business_report, domain_report, trend_report, personas
+        ])
+        print(f"Creative Brief:\n{creative_brief}\n")
+
+        # 3. Dynamic Ideation & Refinement Cycle
+        ideation_agent = IdeationAgent()
+        initial_ideas = ideation_agent.execute(creative_brief)
+        print(f"Initial Ideas:\n{initial_ideas}\n")
+
+        devils_advocate_agent = DevilsAdvocateAgent()
+        initial_idea_list = [f"{use_case.name}: {use_case.description}" for use_case in initial_ideas.use_cases]
+        feedback = devils_advocate_agent.execute(initial_idea_list)
+        print(f"Devil's Advocate Feedback:\n{feedback}\n")
+
+        refined_ideas = ideation_agent.execute(creative_brief, feedback=feedback)
+        print(f"Refined Ideas:\n{refined_ideas}\n")
+
+        # 4. Multi-Faceted Evaluation Phase
+        eval_coordinator = EvaluationCoordinatorAgent()
+        refined_idea_list = [f"{use_case.name}: {use_case.description}" for use_case in refined_ideas.use_cases]
+        scored_ideas = eval_coordinator.execute(refined_idea_list)
+        
+        ranking_agent = RankingAgent()
+        ranked_ideas = ranking_agent.execute(scored_ideas)
+        print(f"Ranked Ideas:\n{ranked_ideas}\n")
+
+        # 5. Reporting Phase
+        report_synthesizer = ReportSynthesizerAgent()
+        final_report = report_synthesizer.execute(ranked_ideas, creative_brief)
+        print(f"Final Report:\n{final_report}")
+        
+        return final_report
 
     async def run_research_agents_parallel(self, mission_brief: MissionBrief):
         """
@@ -65,57 +138,23 @@ class OrchestratorAgent:
 
     def run_workflow(self, initial_prompt: str, user_refinement: str):
         # 1. Query Enrichment Layer
-        clarifier_agent = ClarifierAgent(agent=self._agent)
+        clarifier_agent = ClarifierAgent()
         clarifying_questions = clarifier_agent.execute(initial_prompt)
         print(f"Clarifying Questions:\n{clarifying_questions}\n")
 
         conversation_history = [initial_prompt, clarifying_questions, user_refinement]
-        summarizer_agent = ConversationSummarizerAgent(agent=self._agent)
+        summarizer_agent = ConversationSummarizerAgent()
         summary = summarizer_agent.execute(conversation_history)
         print(f"Conversation Summary:\n{summary}\n")
 
-        enhancer_agent = QueryEnhancerAgent(agent=self._agent)
+        enhancer_agent = QueryEnhancerAgent()
         enhanced_prompt = enhancer_agent.execute(summary)
         print(f"Enhanced Prompt:\n{enhanced_prompt}\n")
 
-        understanding_agent = QueryUnderstandingAgent(agent=self._agent)
+        understanding_agent = QueryUnderstandingAgent(model_id="anthropic.claude-3-5-sonnet-20240620-v1:0")
         mission_brief = understanding_agent.execute(enhanced_prompt)
         print(f"Mission Brief:\n{mission_brief.model_dump_json(indent=2)}\n")
 
-        # 2. Comprehensive Research Phase - Now Running in Parallel!
-        research_results = asyncio.run(self.run_research_agents_parallel(mission_brief))
-        generic_report, business_report, domain_report, trend_report, personas = research_results
-
-        search_summarizer_agent = SearchSummarizerAgent(agent=self._agent)
-        creative_brief = search_summarizer_agent.execute([
-            generic_report, business_report, domain_report, trend_report, personas
-        ])
-        print(f"Creative Brief:\n{creative_brief}\n")
-
-        # 3. Dynamic Ideation & Refinement Cycle
-        ideation_agent = IdeationAgent(agent=self._agent)
-        initial_ideas = ideation_agent.execute(creative_brief)
-        print(f"Initial Ideas:\n{initial_ideas}\n")
-
-        devils_advocate_agent = DevilsAdvocateAgent(agent=self._agent)
-        feedback = devils_advocate_agent.execute(initial_ideas)
-        print(f"Devil's Advocate Feedback:\n{feedback}\n")
-
-        refined_ideas = ideation_agent.execute(creative_brief, feedback=feedback)
-        print(f"Refined Ideas:\n{refined_ideas}\n")
-
-        # 4. Multi-Faceted Evaluation Phase
-        eval_coordinator = EvaluationCoordinatorAgent(agent=self._agent)
-        scored_ideas = eval_coordinator.execute(refined_ideas)
-        
-        ranking_agent = RankingAgent(agent=self._agent)
-        ranked_ideas = ranking_agent.execute(scored_ideas)
-        print(f"Ranked Ideas:\n{ranked_ideas}\n")
-
-        # 5. Reporting Phase
-        report_synthesizer = ReportSynthesizerAgent(agent=self._agent)
-        final_report = report_synthesizer.execute(ranked_ideas, creative_brief)
-        print(f"Final Report:\n{final_report}")
-        
-        return final_report
+        # Continue with the rest of the workflow using the new method
+        return self._run_research_workflow(mission_brief)
 

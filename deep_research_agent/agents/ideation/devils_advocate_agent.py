@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 
 
 class DevilsAdvocateAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Devil's Advocate Agent. Your role is to be a critical, constructive challenger. "
             "Analyze a list of ideas and provide sharp, insightful critiques for each one, pointing out "

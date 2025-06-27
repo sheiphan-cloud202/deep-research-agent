@@ -1,12 +1,13 @@
 from strands import Agent
+from typing import Optional
 
 from deep_research_agent.agents.base_agent import BaseAgent
 from deep_research_agent.schemas import MissionBrief, Filters, DecomposedTasks
 
 
 class QueryUnderstandingAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Query Understanding Agent. Your job is to analyze an enhanced prompt "
             "and convert it into a structured JSON Mission Brief. You must identify the main topic, "

@@ -1,12 +1,12 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 import json
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 
 
 class ReportSynthesizerAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Report Synthesizer Agent. Your job is to create a final, comprehensive, and well-structured "
             "report in Markdown format. The report should summarize the entire research and ideation process, "

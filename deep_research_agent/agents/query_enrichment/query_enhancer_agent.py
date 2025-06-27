@@ -1,10 +1,11 @@
 from strands import Agent
+from typing import Optional
 from deep_research_agent.agents.base_agent import BaseAgent
 
 
 class QueryEnhancerAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Query Enhancer Agent. Your task is to take a summarized user request "
             "and transform it into a formal, actionable, and inspiring mission prompt for a team of AI agents. "

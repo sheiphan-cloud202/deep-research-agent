@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 
 
 class ConversationSummarizerAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Conversation Summarizer Agent. Your job is to take a conversation history "
             "(a list of utterances) and summarize it into a single, cohesive paragraph. "

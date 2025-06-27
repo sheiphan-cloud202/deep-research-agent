@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 
 
 class SearchSummarizerAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are a Search Summarizer Agent. Your job is to synthesize multiple research reports "
             "and user personas into a single, well-structured 'Creative Brief' in Markdown format. "

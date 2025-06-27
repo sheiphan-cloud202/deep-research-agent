@@ -1,12 +1,12 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 from deep_research_agent.schemas import EvaluationScore
 
 
 class RankingAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         # This agent performs a deterministic ranking, so the LLM agent is not used,
         # but we adhere to the BaseAgent pattern.
 

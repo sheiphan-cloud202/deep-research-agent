@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
 from deep_research_agent.agents.evaluation.ethical_guardian_agent import EthicalGuardianAgent
@@ -7,16 +7,16 @@ from deep_research_agent.agents.evaluation.technical_feasibility_agent import Te
 
 
 class EvaluationCoordinatorAgent(BaseAgent):
-    def __init__(self, agent: Agent):
-        super().__init__(agent)
+    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+        super().__init__(agent, model_id)
         self._agent.system_prompt = (
             "You are an Evaluation Coordinator Agent. Your role is to manage the multi-faceted "
             "evaluation of a list of ideas by delegating to specialist evaluator agents."
         )
         # Specialist agents are initialized here
-        self.technical_feasibility_agent = TechnicalFeasibilityAgent(agent)
-        self.ethical_guardian_agent = EthicalGuardianAgent(agent)
-        self.market_viability_agent = MarketViabilityAgent(agent)
+        self.technical_feasibility_agent = TechnicalFeasibilityAgent(agent=self._agent)
+        self.ethical_guardian_agent = EthicalGuardianAgent(agent=self._agent)
+        self.market_viability_agent = MarketViabilityAgent(agent=self._agent)
 
     def execute(self, ideas: List[str]) -> Dict:
         """
