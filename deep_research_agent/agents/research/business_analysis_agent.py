@@ -23,21 +23,23 @@ def business_analysis(query: str, agent: Optional[Agent] = None) -> str:
         )
         agent = Agent(model=model)
     
+    # Import prompt service for consistent prompting
+    from deep_research_agent.prompt_service import PromptService, AgentType
+    
     # Create an agent with the websearch tool
     analysis_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=(
-            "You are a Business Analysis Agent. Your task is to perform a web search based on a given query "
-            "to analyze the market size, economic impact, and business potential of a topic. "
-            "Synthesize the findings into a concise report."
-        )
+        system_prompt=PromptService.get_system_prompt(AgentType.BUSINESS_ANALYSIS)
     )
     
     # Call the agent and return its response
-    result = analysis_agent(
-        f"Perform a business analysis and market research on the following topic: {query}"
+    user_prompt = PromptService.format_user_prompt(
+        AgentType.BUSINESS_ANALYSIS,
+        "analyze",
+        query=query
     )
+    result = analysis_agent(user_prompt)
     return str(result)
 
 

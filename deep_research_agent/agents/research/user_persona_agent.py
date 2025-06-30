@@ -24,22 +24,22 @@ def user_persona_agent(mission: MissionBrief, agent: Optional[Agent] = None) -> 
         )
         agent = Agent(model=model)
     
+    # Import prompt service for consistent prompting
+    from deep_research_agent.prompt_service import PromptService, AgentType
+    
     # Create an agent with the websearch tool
     persona_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=(
-            "You are a User Persona Agent. Your job is to create detailed, realistic user personas "
-            "based on a given topic. For the given user groups, create a persona with a name, goals, "
-            "pain points, and technical skills. Present these personas in a clear, readable format."
-            "Use the websearch tool to find information about the user groups to make the personas more realistic."
-        )
+        system_prompt=PromptService.get_system_prompt(AgentType.USER_PERSONA)
     )
 
-    result = persona_agent(
-        f"Based on the following mission, create detailed user personas for the key user groups involved. "
-        f"Mission: {mission.main_topic}"
+    user_prompt = PromptService.format_user_prompt(
+        AgentType.USER_PERSONA,
+        "create_persona",
+        user_data=f"Mission: {mission.main_topic}"
     )
+    result = persona_agent(user_prompt)
     return str(result)
 
 

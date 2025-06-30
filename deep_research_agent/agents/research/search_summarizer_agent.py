@@ -1,16 +1,13 @@
 from typing import List, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
+from deep_research_agent.prompt_service import PromptService, AgentType
 
 
 class SearchSummarizerAgent(BaseAgent):
     def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = (
-            "You are a Search Summarizer Agent. Your job is to synthesize multiple research reports "
-            "and user personas into a single, well-structured 'Creative Brief' in Markdown format. "
-            "This brief should highlight the key market context, clinical findings, emerging trends, and user personas."
-        )
+        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.SEARCH_SUMMARIZER)
 
     def execute(self, research_reports: List[str]) -> str:
         """
@@ -18,8 +15,10 @@ class SearchSummarizerAgent(BaseAgent):
         """
         print("Executing Search Summarizer Agent...")
         reports_str = "\n\n---\n\n".join(research_reports)
-        result = self._agent(
-            "Please synthesize the following research reports and user personas into a "
-            f"cohesive 'Creative Brief' in Markdown format:\n\n{reports_str}"
+        user_prompt = PromptService.format_user_prompt(
+            AgentType.SEARCH_SUMMARIZER,
+            "summarize_reports",
+            reports_str=reports_str
         )
+        result = self._agent(user_prompt)
         return str(result)  # type: ignore

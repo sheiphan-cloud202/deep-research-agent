@@ -4,15 +4,13 @@ from deep_research_agent.agents.base_agent import BaseAgent
 from deep_research_agent.agents.evaluation.ethical_guardian_agent import EthicalGuardianAgent
 from deep_research_agent.agents.evaluation.market_viability_agent import MarketViabilityAgent
 from deep_research_agent.agents.evaluation.technical_feasibility_agent import TechnicalFeasibilityAgent
+from deep_research_agent.prompt_service import PromptService, AgentType
 
 
 class EvaluationCoordinatorAgent(BaseAgent):
     def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = (
-            "You are an Evaluation Coordinator Agent. Your role is to manage the multi-faceted "
-            "evaluation of a list of ideas by delegating to specialist evaluator agents."
-        )
+        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.EVALUATION_COORDINATOR)
         # Specialist agents are initialized here
         self.technical_feasibility_agent = TechnicalFeasibilityAgent(agent=self._agent)
         self.ethical_guardian_agent = EthicalGuardianAgent(agent=self._agent)
