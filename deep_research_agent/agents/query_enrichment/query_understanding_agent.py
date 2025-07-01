@@ -2,22 +2,24 @@ from strands import Agent
 from typing import Optional
 
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.schemas import MissionBrief, Filters, DecomposedTasks
-from deep_research_agent.prompt_service import PromptService, AgentType
+from deep_research_agent.common.schemas import MissionBrief
+from deep_research_agent.services.prompt_service import PromptService, AgentType
+from deep_research_agent.utils.logger import logger
 
 
 class QueryUnderstandingAgent(BaseAgent):
-    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+    def __init__(self, prompt_service: PromptService, agent: Optional[Agent] = None, model_id: Optional[str] = None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.QUERY_UNDERSTANDING)
+        self.prompt_service = prompt_service
+        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.QUERY_UNDERSTANDING)
 
     def execute(self, enhanced_prompt: str) -> MissionBrief:
         """
         Converts an enhanced prompt into a structured JSON Mission Brief
         using a large language model.
         """
-        print("Executing Query Understanding Agent...")
-        user_prompt = PromptService.format_user_prompt(
+        logger.info("Executing Query Understanding Agent...")
+        user_prompt = self.prompt_service.format_user_prompt(
             AgentType.QUERY_UNDERSTANDING,
             "analyze",
             enhanced_prompt=enhanced_prompt

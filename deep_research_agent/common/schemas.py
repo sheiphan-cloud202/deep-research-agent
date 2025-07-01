@@ -1,5 +1,37 @@
 from typing import List, Dict
 from pydantic import BaseModel, Field
+from enum import Enum
+
+
+class AgentType(Enum):
+    """Enumeration of all agent types in the system"""
+    # Evaluation agents
+    ETHICAL_GUARDIAN = "ethical_guardian"
+    EVALUATION_COORDINATOR = "evaluation_coordinator"
+    MARKET_VIABILITY = "market_viability"
+    RANKING = "ranking"
+    TECHNICAL_FEASIBILITY = "technical_feasibility"
+    
+    # Ideation agents
+    DEVILS_ADVOCATE = "devils_advocate"
+    IDEATION = "ideation"
+    
+    # Query enrichment agents
+    CLARIFIER = "clarifier"
+    CONVERSATION_SUMMARIZER = "conversation_summarizer"
+    QUERY_ENHANCER = "query_enhancer"
+    QUERY_UNDERSTANDING = "query_understanding"
+    
+    # Reporting agents
+    REPORT_SYNTHESIZER = "report_synthesizer"
+    
+    # Research agents
+    BUSINESS_ANALYSIS = "business_analysis"
+    DOMAIN_SEARCH = "domain_search"
+    GENERIC_SEARCH = "generic_search"
+    SEARCH_SUMMARIZER = "search_summarizer"
+    TREND_SPOTTER = "trend_spotter"
+    USER_PERSONA = "user_persona"
 
 
 class Filters(BaseModel):

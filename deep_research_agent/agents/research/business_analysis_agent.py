@@ -2,6 +2,9 @@ import asyncio
 from strands import Agent, tool
 from deep_research_agent.agents.research.tools import websearch
 from typing import Optional
+from deep_research_agent.utils.logger import logger
+from deep_research_agent.common.schemas import AgentType
+from deep_research_agent.services.prompt_service import PromptService
 
 
 @tool
@@ -13,7 +16,7 @@ def business_analysis(query: str, agent: Optional[Agent] = None) -> str:
         query: The analysis query
         agent: Shared Agent instance (if None, creates a new one)
     """
-    print(f"Executing Business Analysis with query: {query}")
+    logger.info(f"Executing Business Analysis with query: {query}")
     
     if agent is None:
         from strands.models import BedrockModel
@@ -23,22 +26,24 @@ def business_analysis(query: str, agent: Optional[Agent] = None) -> str:
         )
         agent = Agent(model=model)
     
-    # Import prompt service for consistent prompting
-    from deep_research_agent.prompt_service import PromptService, AgentType
-    
-    # Create an agent with the websearch tool
+    # Initialize prompt service to access system and user prompts
+    prompt_service = PromptService()
+
+    # Create an agent with the websearch tool and the appropriate system prompt
     analysis_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=PromptService.get_system_prompt(AgentType.BUSINESS_ANALYSIS)
+        system_prompt=prompt_service.get_system_prompt(AgentType.BUSINESS_ANALYSIS)
     )
-    
-    # Call the agent and return its response
-    user_prompt = PromptService.format_user_prompt(
+
+    # Build the user prompt using the template
+    user_prompt = prompt_service.format_user_prompt(
         AgentType.BUSINESS_ANALYSIS,
         "analyze",
         query=query
     )
+
+    # Call the agent and return its response
     result = analysis_agent(user_prompt)
     return str(result)
 

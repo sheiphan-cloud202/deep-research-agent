@@ -1,14 +1,16 @@
 from typing import Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.schemas import UseCases
-from deep_research_agent.prompt_service import PromptService, AgentType
+from deep_research_agent.common.schemas import UseCases
+from deep_research_agent.services.prompt_service import PromptService, AgentType
+from deep_research_agent.utils.logger import logger
 
 
 class IdeationAgent(BaseAgent):
-    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+    def __init__(self, prompt_service: PromptService, agent: Optional[Agent] = None, model_id: Optional[str] = None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.IDEATION)
+        self.prompt_service = prompt_service
+        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.IDEATION)
 
     def execute(
         self, creative_brief: str, feedback: Optional[str] = None
@@ -17,8 +19,8 @@ class IdeationAgent(BaseAgent):
         Generates or refines ideas based on a creative brief and optional feedback.
         """
         if feedback:
-            print("Executing Ideation Agent (Refinement Pass)...")
-            prompt = PromptService.format_user_prompt(
+            logger.info("Executing Ideation Agent (Refinement Pass)...")
+            prompt = self.prompt_service.format_user_prompt(
                 AgentType.IDEATION,
                 "refine_with_feedback",
                 creative_brief=creative_brief,
@@ -27,8 +29,8 @@ class IdeationAgent(BaseAgent):
             result = self._agent.structured_output(UseCases, prompt)
             return result
         else:
-            print("Executing Ideation Agent (Initial Pass)...")
-            prompt = PromptService.format_user_prompt(
+            logger.info("Executing Ideation Agent (Initial Pass)...")
+            prompt = self.prompt_service.format_user_prompt(
                 AgentType.IDEATION,
                 "generate_initial",
                 creative_brief=creative_brief

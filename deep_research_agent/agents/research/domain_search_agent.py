@@ -2,6 +2,9 @@ import asyncio
 from strands import Agent, tool
 from deep_research_agent.agents.research.tools import websearch
 from typing import Optional
+from deep_research_agent.utils.logger import logger
+from deep_research_agent.common.schemas import AgentType
+from deep_research_agent.services.prompt_service import PromptService
 
 
 @tool
@@ -13,7 +16,7 @@ def domain_search(query: str, agent: Optional[Agent] = None) -> str:
         query: The search query
         agent: Shared Agent instance (if None, creates a new one)
     """
-    print(f"Executing Domain Search with query: {query}")
+    logger.info(f"Executing Domain Search with query: {query}")
     
     if agent is None:
         from strands.models import BedrockModel
@@ -23,21 +26,27 @@ def domain_search(query: str, agent: Optional[Agent] = None) -> str:
         )
         agent = Agent(model=model)
     
-    # Create an agent with the websearch tool
+    # Initialize prompt service to access system and user prompts
+    prompt_service = PromptService()
+
+    # Create an agent with the websearch tool and the appropriate system prompt
     search_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=(
-            "You are a Domain-Specific Search Agent. Your task is to perform a deep, targeted web search "
-            "for niche, expert-level insights on a given query. You may need to look into scientific papers, "
-            "clinical studies, or technical documentation. Synthesize the findings into a concise summary."
-        )
+        system_prompt=prompt_service.get_system_prompt(AgentType.DOMAIN_SEARCH)
     )
-    
+
+    # Build the user prompt using the template. Since domain information isn't provided separately,
+    # we pass an empty string for the "domain" placeholder.
+    user_prompt = prompt_service.format_user_prompt(
+        AgentType.DOMAIN_SEARCH,
+        "domain_search",
+        domain="",
+        query=query
+    )
+
     # Call the agent and return its response
-    result = search_agent(
-        f"Perform a domain-specific, in-depth search for expert insights on: {query}"
-    )
+    result = search_agent(user_prompt)
     return str(result)
 
 

@@ -2,6 +2,7 @@ from typing import Optional
 from strands import Agent
 from strands.models import BedrockModel
 from botocore.config import Config
+from deep_research_agent.common.config import settings
 
 
 class AgentFactory:
@@ -11,12 +12,12 @@ class AgentFactory:
     def get_default_agent(cls) -> Agent:
         if cls._default_agent is None:
             config = Config(
-                connect_timeout=900,
-                read_timeout=900
+                connect_timeout=settings.boto_connect_timeout,
+                read_timeout=settings.boto_read_timeout
             )
             model = BedrockModel(
-                model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-                region_name="us-east-1",
+                model_id=settings.default_model_id,
+                region_name=settings.aws_region,
                 boto_client_config=config
             )
             cls._default_agent = Agent(model=model)
@@ -25,13 +26,13 @@ class AgentFactory:
     @classmethod
     def create_agent(cls, model_id: Optional[str] = None) -> Agent:
         config = Config(
-            connect_timeout=900,
-            read_timeout=900
+            connect_timeout=settings.boto_connect_timeout,
+            read_timeout=settings.boto_read_timeout
         )
         if model_id:
             model = BedrockModel(
                 model_id=model_id,
-                region_name="us-east-1",
+                region_name=settings.aws_region,
                 boto_client_config=config
             )
             return Agent(model=model)

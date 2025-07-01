@@ -1,7 +1,7 @@
 import asyncio
 from strands import Agent, tool
 from deep_research_agent.agents.research.tools import websearch
-from deep_research_agent.schemas import MissionBrief
+from deep_research_agent.common.schemas import MissionBrief
 from typing import Optional
 
 
@@ -25,16 +25,21 @@ def user_persona_agent(mission: MissionBrief, agent: Optional[Agent] = None) -> 
         agent = Agent(model=model)
     
     # Import prompt service for consistent prompting
-    from deep_research_agent.prompt_service import PromptService, AgentType
+    from deep_research_agent.common.schemas import AgentType
+    from deep_research_agent.services.prompt_service import PromptService
     
-    # Create an agent with the websearch tool
+    # Initialize the prompt service to fetch system and user prompts
+    prompt_service = PromptService()
+
+    # Create an agent with the websearch tool and the appropriate system prompt
     persona_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=PromptService.get_system_prompt(AgentType.USER_PERSONA)
+        system_prompt=prompt_service.get_system_prompt(AgentType.USER_PERSONA)
     )
 
-    user_prompt = PromptService.format_user_prompt(
+    # Build the user prompt from the template
+    user_prompt = prompt_service.format_user_prompt(
         AgentType.USER_PERSONA,
         "create_persona",
         user_data=f"Mission: {mission.main_topic}"

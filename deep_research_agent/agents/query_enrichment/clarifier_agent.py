@@ -1,20 +1,22 @@
 from strands import Agent
 from typing import Optional
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.prompt_service import PromptService, AgentType
+from deep_research_agent.services.prompt_service import PromptService, AgentType
+from deep_research_agent.utils.logger import logger
 
 
 class ClarifierAgent(BaseAgent):
-    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+    def __init__(self, prompt_service: PromptService, agent: Optional[Agent] = None, model_id: Optional[str] = None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.CLARIFIER)
+        self.prompt_service = prompt_service
+        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.CLARIFIER)
 
-    def execute(self, initial_prompt: str) -> str:
+    def execute(self, initial_prompt: str, full_conversation: str) -> str:
         """
         Takes an initial prompt and generates clarifying questions using an LLM.
         """
-        print("Executing Clarifier Agent...")
-        user_prompt = PromptService.format_user_prompt(
+        logger.info("Executing Clarifier Agent...")
+        user_prompt = self.prompt_service.format_user_prompt(
             AgentType.CLARIFIER,
             "clarify",
             initial_prompt=initial_prompt
@@ -26,7 +28,7 @@ class ClarifierAgent(BaseAgent):
         """
         Generate clarifying questions based on ongoing conversation context.
         """
-        user_prompt = PromptService.format_user_prompt(
+        user_prompt = self.prompt_service.format_user_prompt(
             AgentType.CLARIFIER,
             "interactive",
             latest_context=latest_context,

@@ -1,7 +1,8 @@
 from typing import List, Dict, Optional
 from strands import Agent
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.schemas import EvaluationScore
+from deep_research_agent.common.schemas import EvaluationScore
+from deep_research_agent.utils.logger import logger
 
 
 class RankingAgent(BaseAgent):
@@ -14,7 +15,7 @@ class RankingAgent(BaseAgent):
         """
         Consolidates scores and ranks all refined ideas.
         """
-        print("Executing Ranking Agent...")
+        logger.info("Executing Ranking Agent...")
         
         processed_data = []
         for idea, scores in scored_ideas.items():
@@ -29,8 +30,8 @@ class RankingAgent(BaseAgent):
         # Rank based on overall score
         ranked_list = sorted(processed_data, key=lambda x: x['overall_score'], reverse=True)
         
-        print("Ranked List:")
+        logger.info("Ranked List:")
         for item in ranked_list:
-            print(f"- {item['idea']} (Overall Score: {item['overall_score']})")
+            logger.info(f"- {item['idea']} (Overall Score: {item['overall_score']})")
             
         return ranked_list

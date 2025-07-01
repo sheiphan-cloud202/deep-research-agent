@@ -2,11 +2,11 @@
 Prompts for reporting agents.
 """
 
-from typing import Dict
+from deep_research_agent.common.schemas import AgentType
 
 # System prompts for reporting agents
 SYSTEM_PROMPTS = {
-    "report_synthesizer": (
+    AgentType.REPORT_SYNTHESIZER: (
         "You are a Report Synthesizer Agent. Your job is to create a final, comprehensive, and well-structured "
         "report in Markdown format. The report should summarize the entire research and ideation process, "
         "highlighting the top-ranked idea, its scores, and the justification for its ranking. "
@@ -16,7 +16,7 @@ SYSTEM_PROMPTS = {
 
 # User prompt templates for reporting agents
 USER_PROMPT_TEMPLATES = {
-    "report_synthesizer": {
+    AgentType.REPORT_SYNTHESIZER: {
         "synthesize": (
             "Please create a final, compelling report in Markdown format. "
             "The report should be based on the following creative brief and ranked list of ideas.\n\n"

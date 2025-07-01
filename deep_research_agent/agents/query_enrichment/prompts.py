@@ -2,11 +2,11 @@
 Prompts for query enrichment agents.
 """
 
-from typing import Dict
+from deep_research_agent.common.schemas import AgentType
 
 # System prompts for query enrichment agents
 SYSTEM_PROMPTS = {
-    "clarifier": (
+    AgentType.CLARIFIER: (
         "You are a Clarifier Agent. Your job is to analyze a user's prompt "
         "and ask 2-3 specific, targeted questions to help refine their idea. "
         "The goal is to get more detail about the target user, primary goals, and key features. "
@@ -14,19 +14,19 @@ SYSTEM_PROMPTS = {
         "'start agent', 'begin', or 'go'. Continue the conversation until they use one of these trigger words."
     ),
     
-    "conversation_summarizer": (
+    AgentType.CONVERSATION_SUMMARIZER: (
         "You are a Conversation Summarizer Agent. Your job is to take a conversation history "
         "(a list of utterances) and summarize it into a single, cohesive paragraph. "
         "Focus on capturing the user's core need and the refined requirements."
     ),
     
-    "query_enhancer": (
+    AgentType.QUERY_ENHANCER: (
         "You are a Query Enhancer Agent. Your task is to take a summarized user request "
         "and transform it into a formal, actionable, and inspiring mission prompt for a team of AI agents. "
         "Start the prompt with 'Your mission is to:'"
     ),
     
-    "query_understanding": (
+    AgentType.QUERY_UNDERSTANDING: (
         "You are a Query Understanding Agent. Your job is to analyze an enhanced prompt "
         "and convert it into a structured JSON Mission Brief. You must identify the main topic, "
         "industry, relevant tools, and decompose the main query into sub-tasks for other agents. "
@@ -36,14 +36,14 @@ SYSTEM_PROMPTS = {
 
 # User prompt templates for query enrichment agents
 USER_PROMPT_TEMPLATES = {
-    "query_understanding": {
+    AgentType.QUERY_UNDERSTANDING: {
         "analyze": (
             "Analyze the following user mission and extract the key components into the required format. "
             "Here is the mission: '{enhanced_prompt}'"
         )
     },
     
-    "clarifier": {
+    AgentType.CLARIFIER: {
         "clarify": "Here is the user's initial idea: '{initial_prompt}'. Please generate clarifying questions.",
         "interactive": (
             "Here is the conversation so far: '{full_context}'. "
@@ -54,11 +54,11 @@ USER_PROMPT_TEMPLATES = {
         )
     },
     
-    "query_enhancer": {
+    AgentType.QUERY_ENHANCER: {
         "enhance": "Please enhance the following summary into a formal mission prompt: '{summary}'"
     },
     
-    "conversation_summarizer": {
+    AgentType.CONVERSATION_SUMMARIZER: {
         "summarize": "Please summarize the following conversation into one paragraph:\n\n{history_str}"
     },
 } 
