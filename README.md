@@ -27,13 +27,17 @@ The system includes a modular `PromptService` that manages all system prompts an
 ### Usage
 
 ```python
-from deep_research_agent.prompt_service import PromptService, AgentType
+from deep_research_agent.services.prompt_service import PromptService
+from deep_research_agent.common.schemas import AgentType
+
+# Create service instance
+prompt_service = PromptService()
 
 # Get system prompt for an agent
-system_prompt = PromptService.get_system_prompt(AgentType.ETHICAL_GUARDIAN)
+system_prompt = prompt_service.get_system_prompt(AgentType.ETHICAL_GUARDIAN)
 
 # Format user prompt with parameters
-user_prompt = PromptService.format_user_prompt(
+user_prompt = prompt_service.format_user_prompt(
     AgentType.ETHICAL_GUARDIAN,
     "evaluate",
     idea="AI-powered transportation system"
@@ -41,12 +45,13 @@ user_prompt = PromptService.format_user_prompt(
 
 # In agent classes
 class MyAgent(BaseAgent):
-    def __init__(self, agent=None, model_id=None):
+    def __init__(self, prompt_service: PromptService, agent=None, model_id=None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.MY_AGENT)
+        self.prompt_service = prompt_service
+        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.MY_AGENT)
     
     def execute(self, data):
-        prompt = PromptService.format_user_prompt(
+        prompt = self.prompt_service.format_user_prompt(
             AgentType.MY_AGENT, 
             "analyze", 
             data=data
@@ -84,7 +89,7 @@ USER_PROMPT_TEMPLATES = {
 }
 ```
 
-2. **Add enum value** in `prompt_service.py`:
+2. **Add enum value** in `common/schemas.py`:
 ```python
 class AgentType(Enum):
     MY_NEW_AGENT = "my_new_agent"
@@ -93,9 +98,10 @@ class AgentType(Enum):
 3. **Use in agent class**:
 ```python
 class MyNewAgent(BaseAgent):
-    def __init__(self, agent=None, model_id=None):
+    def __init__(self, prompt_service: PromptService, agent=None, model_id=None):
         super().__init__(agent, model_id)
-        self._agent.system_prompt = PromptService.get_system_prompt(AgentType.MY_NEW_AGENT)
+        self.prompt_service = prompt_service
+        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.MY_NEW_AGENT)
 ```
 
 ### Benefits
