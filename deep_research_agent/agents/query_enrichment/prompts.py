@@ -13,19 +13,16 @@ SYSTEM_PROMPTS = {
         "When the user is ready to proceed, they will say 'start the agent', 'yes', 'run', "
         "'start agent', 'begin', or 'go'. Continue the conversation until they use one of these trigger words."
     ),
-    
     AgentType.CONVERSATION_SUMMARIZER: (
         "You are a Conversation Summarizer Agent. Your job is to take a conversation history "
         "(a list of utterances) and summarize it into a single, cohesive paragraph. "
         "Focus on capturing the user's core need and the refined requirements."
     ),
-    
     AgentType.QUERY_ENHANCER: (
         "You are a Query Enhancer Agent. Your task is to take a summarized user request "
         "and transform it into a formal, actionable, and inspiring mission prompt for a team of AI agents. "
         "Start the prompt with 'Your mission is to:'"
     ),
-    
     AgentType.QUERY_UNDERSTANDING: (
         "You are a Query Understanding Agent. Your job is to analyze an enhanced prompt "
         "and convert it into a structured JSON Mission Brief. You must identify the main topic, "
@@ -42,7 +39,6 @@ USER_PROMPT_TEMPLATES = {
             "Here is the mission: '{enhanced_prompt}'"
         )
     },
-    
     AgentType.CLARIFIER: {
         "clarify": "Here is the user's initial idea: '{initial_prompt}'. Please generate clarifying questions.",
         "interactive": (
@@ -51,14 +47,12 @@ USER_PROMPT_TEMPLATES = {
             "Based on this conversation, please ask 1-2 thoughtful follow-up questions "
             "to help refine and clarify their idea further. Keep the questions focused "
             "and avoid repeating information already covered."
-        )
+        ),
     },
-    
     AgentType.QUERY_ENHANCER: {
         "enhance": "Please enhance the following summary into a formal mission prompt: '{summary}'"
     },
-    
     AgentType.CONVERSATION_SUMMARIZER: {
         "summarize": "Please summarize the following conversation into one paragraph:\n\n{history_str}"
     },
-} 
+}

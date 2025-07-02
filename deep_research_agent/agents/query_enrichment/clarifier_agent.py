@@ -1,12 +1,17 @@
 from strands import Agent
-from typing import Optional
+
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.services.prompt_service import PromptService, AgentType
+from deep_research_agent.services.prompt_service import AgentType, PromptService
 from deep_research_agent.utils.logger import logger
 
 
 class ClarifierAgent(BaseAgent):
-    def __init__(self, prompt_service: PromptService, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+    def __init__(
+        self,
+        prompt_service: PromptService,
+        agent: Agent | None = None,
+        model_id: str | None = None,
+    ):
         super().__init__(agent, model_id)
         self.prompt_service = prompt_service
         self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.CLARIFIER)
@@ -17,9 +22,7 @@ class ClarifierAgent(BaseAgent):
         """
         logger.info("Executing Clarifier Agent...")
         user_prompt = self.prompt_service.format_user_prompt(
-            AgentType.CLARIFIER,
-            "clarify",
-            initial_prompt=initial_prompt
+            AgentType.CLARIFIER, "clarify", initial_prompt=initial_prompt
         )
         result = self._agent(user_prompt)
         return str(result)  # type: ignore
@@ -32,7 +35,7 @@ class ClarifierAgent(BaseAgent):
             AgentType.CLARIFIER,
             "interactive",
             latest_context=latest_context,
-            full_context=full_context
+            full_context=full_context,
         )
         result = self._agent(user_prompt)
         return str(result)  # type: ignore

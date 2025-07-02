@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 def setup_logging(level=logging.INFO):
     """
     Set up logging for the application.
@@ -11,7 +12,7 @@ def setup_logging(level=logging.INFO):
     logger.setLevel(level)
 
     # create a logging format
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # create a handler to write to stdout
     handler = logging.StreamHandler(sys.stdout)
@@ -21,7 +22,8 @@ def setup_logging(level=logging.INFO):
     # add the handlers to the logger
     if not logger.handlers:
         logger.addHandler(handler)
-        
+
     return logger
 
-logger = setup_logging() 
+
+logger = setup_logging()

@@ -1,10 +1,12 @@
-from strands import tool
-from duckduckgo_search import DDGS
-from duckduckgo_search.exceptions import RatelimitException, DuckDuckGoSearchException
 import logging
+
+from duckduckgo_search import DDGS
+from duckduckgo_search.exceptions import DuckDuckGoSearchException, RatelimitException
+from strands import tool
 
 # Configure logging
 logging.getLogger("strands").setLevel(logging.INFO)
+
 
 # Define a websearch tool
 @tool
@@ -25,4 +27,4 @@ def websearch(keywords: str, region: str = "us-en", max_results: int | None = No
     except DuckDuckGoSearchException as d:
         return f"DuckDuckGoSearchException: {d}"
     except Exception as e:
-        return f"Exception: {e}" 
+        return f"Exception: {e}"

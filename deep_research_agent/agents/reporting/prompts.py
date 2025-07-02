@@ -26,4 +26,4 @@ USER_PROMPT_TEMPLATES = {
             "its scores, and a compelling justification. It should be professional and easy to read."
         )
     },
-} 
+}

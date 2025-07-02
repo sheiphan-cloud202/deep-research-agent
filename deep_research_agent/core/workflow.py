@@ -28,4 +28,4 @@ SIMPLE_WORKFLOW = [
     AgentType.IDEATION,
     AgentType.RANKING,
     AgentType.REPORT_SYNTHESIZER,
-] 
+]

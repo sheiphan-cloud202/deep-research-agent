@@ -1,15 +1,15 @@
-from deep_research_agent.common.schemas import AgentType
 from deep_research_agent.common.handlers import (
     ConversationSummarizerHandler,
-    QueryEnhancerHandler,
-    QueryUnderstandingHandler,
-    SearchSummarizerHandler,
-    IdeationHandler,
     DevilsAdvocateHandler,
     EvaluationCoordinatorHandler,
+    IdeationHandler,
+    QueryEnhancerHandler,
+    QueryUnderstandingHandler,
     RankingHandler,
-    ReportSynthesizerHandler
+    ReportSynthesizerHandler,
+    SearchSummarizerHandler,
 )
+from deep_research_agent.common.schemas import AgentType
 from deep_research_agent.services.prompt_service import PromptService
 
 # Create a single shared PromptService instance
@@ -25,4 +25,4 @@ AGENT_REGISTRY = {
     AgentType.EVALUATION_COORDINATOR: EvaluationCoordinatorHandler(prompt_service=_prompt_service),
     AgentType.RANKING: RankingHandler(prompt_service=_prompt_service),
     AgentType.REPORT_SYNTHESIZER: ReportSynthesizerHandler(prompt_service=_prompt_service),
-} 
+}

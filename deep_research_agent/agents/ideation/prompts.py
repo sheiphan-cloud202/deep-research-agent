@@ -1,6 +1,7 @@
 """
 Prompts for ideation agents.
 """
+
 from deep_research_agent.common.schemas import AgentType
 
 # System prompts for ideation agents
@@ -10,7 +11,6 @@ SYSTEM_PROMPTS = {
         "Analyze a list of ideas and provide sharp, insightful critiques for each one, pointing out "
         "potential weaknesses, unstated assumptions, or user adoption issues. Frame your output as a list of critiques."
     ),
-    
     AgentType.IDEATION: (
         "You are an Ideation Agent. Your job is to generate creative, actionable use case ideas "
         "based on a 'Creative Brief'. The ideas should be distinct and grounded in the brief. "
@@ -31,13 +31,11 @@ USER_PROMPT_TEMPLATES = {
             "Here is the creative brief:\n\n{creative_brief}\n\n"
             "We have received the following critical feedback on our initial ideas:\n"
             "{feedback}\n\nPlease generate a new, refined list of 10 use cases that address this feedback."
-        )
+        ),
     },
-    
     AgentType.DEVILS_ADVOCATE: {
         "critique": (
-            "Please act as a devil's advocate and provide critical feedback for the following "
-            "ideas:\n{ideas_str}"
+            "Please act as a devil's advocate and provide critical feedback for the following " "ideas:\n{ideas_str}"
         )
     },
-} 
+}

@@ -1,31 +1,33 @@
 import asyncio
+
 from strands import Agent, tool
+
 from deep_research_agent.agents.research.tools import websearch
-from typing import Optional
-from deep_research_agent.utils.logger import logger
 from deep_research_agent.common.schemas import AgentType
 from deep_research_agent.services.prompt_service import PromptService
+from deep_research_agent.utils.logger import logger
 
 
 @tool
-def business_analysis(query: str, agent: Optional[Agent] = None) -> str:
+def business_analysis(query: str, agent: Agent | None = None) -> str:
     """
     Performs business analysis on market and impact.
-    
+
     Args:
         query: The analysis query
         agent: Shared Agent instance (if None, creates a new one)
     """
     logger.info(f"Executing Business Analysis with query: {query}")
-    
+
     if agent is None:
         from strands.models import BedrockModel
+
         model = BedrockModel(
             model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-            region_name="us-east-1"
+            region_name="us-east-1",
         )
         agent = Agent(model=model)
-    
+
     # Initialize prompt service to access system and user prompts
     prompt_service = PromptService()
 
@@ -33,25 +35,21 @@ def business_analysis(query: str, agent: Optional[Agent] = None) -> str:
     analysis_agent = Agent(
         model=agent.model,
         tools=[websearch],
-        system_prompt=prompt_service.get_system_prompt(AgentType.BUSINESS_ANALYSIS)
+        system_prompt=prompt_service.get_system_prompt(AgentType.BUSINESS_ANALYSIS),
     )
 
     # Build the user prompt using the template
-    user_prompt = prompt_service.format_user_prompt(
-        AgentType.BUSINESS_ANALYSIS,
-        "analyze",
-        query=query
-    )
+    user_prompt = prompt_service.format_user_prompt(AgentType.BUSINESS_ANALYSIS, "analyze", query=query)
 
     # Call the agent and return its response
     result = analysis_agent(user_prompt)
     return str(result)
 
 
-async def business_analysis_async(query: str, agent: Optional[Agent] = None) -> str:
+async def business_analysis_async(query: str, agent: Agent | None = None) -> str:
     """
     Async version of business_analysis for parallel execution.
-    
+
     Args:
         query: The analysis query
         agent: Shared Agent instance (if None, creates a new one)

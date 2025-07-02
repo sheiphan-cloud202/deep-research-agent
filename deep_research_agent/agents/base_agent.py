@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+
 from strands import Agent
+
 from deep_research_agent.core.agent_factory import AgentFactory
 
 
 class BaseAgent(ABC):
-    def __init__(self, agent: Optional[Agent] = None, model_id: Optional[str] = None):
+    def __init__(self, agent: Agent | None = None, model_id: str | None = None):
         if agent:
             self._agent = agent
         else:
