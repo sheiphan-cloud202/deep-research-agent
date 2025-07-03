@@ -1,10 +1,7 @@
-from deep_research_agent.agents.evaluation import prompts as evaluation_prompts
-
 # Explicit imports for all prompts modules
+from deep_research_agent.agents.evaluation import prompts as evaluation_prompts
 from deep_research_agent.agents.ideation import prompts as ideation_prompts
-from deep_research_agent.agents.query_enrichment import (
-    prompts as query_enrichment_prompts,
-)
+from deep_research_agent.agents.query_enrichment import prompts as query_enrichment_prompts
 from deep_research_agent.agents.reporting import prompts as reporting_prompts
 from deep_research_agent.agents.research import prompts as research_prompts
 from deep_research_agent.common.schemas import AgentType

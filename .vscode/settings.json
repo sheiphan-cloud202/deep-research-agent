@@ -20,4 +20,4 @@
         ".pytest_cache": true,
         "*.egg-info": true
     }
-} 
+}

@@ -49,11 +49,11 @@ class MyAgent(BaseAgent):
         super().__init__(agent, model_id)
         self.prompt_service = prompt_service
         self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.MY_AGENT)
-    
+
     def execute(self, data):
         prompt = self.prompt_service.format_user_prompt(
-            AgentType.MY_AGENT, 
-            "analyze", 
+            AgentType.MY_AGENT,
+            "analyze",
             data=data
         )
         return self._agent.structured_output(MySchema, prompt)
@@ -66,7 +66,7 @@ Prompts are organized by agent category:
 ```
 deep_research_agent/agents/
 ├── evaluation/prompts.py        # Ethical, technical, market viability agents
-├── ideation/prompts.py          # Ideation and devil's advocate agents  
+├── ideation/prompts.py          # Ideation and devil's advocate agents
 ├── query_enrichment/prompts.py  # Query processing and enhancement agents
 ├── reporting/prompts.py         # Report synthesis agents
 └── research/prompts.py          # Search and analysis agents

@@ -35,7 +35,7 @@ USER_PROMPT_TEMPLATES = {
     },
     AgentType.DEVILS_ADVOCATE: {
         "critique": (
-            "Please act as a devil's advocate and provide critical feedback for the following " "ideas:\n{ideas_str}"
+            "Please act as a devil's advocate and provide critical feedback for the following ideas:\n{ideas_str}"
         )
     },
 }

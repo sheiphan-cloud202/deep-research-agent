@@ -47,4 +47,4 @@
             "python": "${workspaceFolder}/.venv/bin/python"
         }
     ]
-} 
+}
