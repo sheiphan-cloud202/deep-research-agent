@@ -1,4 +1,5 @@
 from deep_research_agent.common.handlers import (
+    ClarifierHandler,
     ConversationSummarizerHandler,
     DevilsAdvocateHandler,
     EvaluationCoordinatorHandler,
@@ -16,6 +17,7 @@ from deep_research_agent.services.prompt_service import PromptService
 _prompt_service = PromptService()
 
 AGENT_REGISTRY = {
+    AgentType.CLARIFIER: ClarifierHandler(prompt_service=_prompt_service),
     AgentType.CONVERSATION_SUMMARIZER: ConversationSummarizerHandler(prompt_service=_prompt_service),
     AgentType.QUERY_ENHANCER: QueryEnhancerHandler(prompt_service=_prompt_service),
     AgentType.QUERY_UNDERSTANDING: QueryUnderstandingHandler(prompt_service=_prompt_service),

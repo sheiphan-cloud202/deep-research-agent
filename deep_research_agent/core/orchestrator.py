@@ -1,6 +1,5 @@
 import asyncio
 
-from deep_research_agent.agents.query_enrichment.clarifier_agent import ClarifierAgent
 from deep_research_agent.agents.research.business_analysis_agent import business_analysis_async
 from deep_research_agent.agents.research.domain_search_agent import domain_search_async
 from deep_research_agent.agents.research.generic_search_agent import generic_search_async
@@ -8,7 +7,7 @@ from deep_research_agent.agents.research.trend_spotter_agent import trend_spotte
 from deep_research_agent.agents.research.user_persona_agent import user_persona_agent_async
 from deep_research_agent.common.schemas import AgentType, MissionBrief
 from deep_research_agent.core.agent_factory import AgentFactory
-from deep_research_agent.core.agent_registry import AGENT_REGISTRY, _prompt_service
+from deep_research_agent.core.agent_registry import AGENT_REGISTRY
 from deep_research_agent.core.workflow import DEFAULT_WORKFLOW, PARALLEL_RESEARCH_STEP
 from deep_research_agent.utils.logger import logger
 
@@ -18,18 +17,6 @@ class OrchestratorAgent:
         self._agent = AgentFactory.get_default_agent()
         self.workflow_context = {}  # Stores the outputs of each step
         self.workflow = workflow if workflow else DEFAULT_WORKFLOW
-
-    def generate_clarifying_questions(self, conversation_history: list) -> str:
-        """
-        Generate clarifying questions based on the conversation history.
-        """
-        clarifier_agent = ClarifierAgent(prompt_service=_prompt_service)
-
-        # Use the latest entry in conversation history for context
-        latest_context = conversation_history[-1] if conversation_history else ""
-        full_context = " ".join(conversation_history)
-
-        return clarifier_agent.execute_interactive(latest_context, full_context)
 
     def run_workflow_from_conversation(self, conversation_history: list):
         """

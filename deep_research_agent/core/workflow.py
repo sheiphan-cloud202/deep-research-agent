@@ -5,6 +5,7 @@ PARALLEL_RESEARCH_STEP = "parallel_research"
 
 # Define the default workflow by listing the agent types in execution order
 DEFAULT_WORKFLOW = [
+    AgentType.CLARIFIER,
     AgentType.CONVERSATION_SUMMARIZER,
     AgentType.QUERY_ENHANCER,
     AgentType.QUERY_UNDERSTANDING,
@@ -20,6 +21,7 @@ DEFAULT_WORKFLOW = [
 
 # Example of a simpler workflow that could be used for different purposes
 SIMPLE_WORKFLOW = [
+    AgentType.CLARIFIER,
     AgentType.CONVERSATION_SUMMARIZER,
     AgentType.QUERY_ENHANCER,
     AgentType.QUERY_UNDERSTANDING,

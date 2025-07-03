@@ -22,6 +22,17 @@ dev = [
     "pre-commit>=3.7.1",
     "ruff>=0.5.0",
 ]
+test = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.12.0",
+    "pytest-env>=1.1.0",
+    "pytest-xdist>=3.5.0",
+    "moto[boto3]>=4.2.0",
+    "responses>=0.24.0",
+    "freezegun>=1.4.0",
+]
 
 [tool.setuptools]
 packages = ["deep_research_agent"]
@@ -59,3 +70,32 @@ ignore = [
 
 [tool.ruff.format]
 quote-style = "double"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=deep_research_agent",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+    "aws: Tests that require AWS credentials",
+]
+env = [
+    "AWS_REGION=us-east-1",
+    "DEFAULT_MODEL_ID=test-model",
+    "BOTO_CONNECT_TIMEOUT=10",
+    "BOTO_READ_TIMEOUT=10",
+]
+asyncio_mode = "auto"

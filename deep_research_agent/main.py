@@ -16,38 +16,12 @@ def main():
         logger.warning("Please provide an initial idea to get started.")
         return
 
-    # Start conversation flow
+    # Initialize orchestrator and start the workflow
     conversation_history = [initial_prompt]
-    trigger_words = ["start the agent", "yes", "run", "start agent", "begin", "go"]
-
-    logger.info("\n💭 Great! Let me ask you some clarifying questions to better understand your idea...\n")
-
-    # Initialize orchestrator and clarifier
     orchestrator = OrchestratorAgent()
 
-    while True:
-        # Generate clarifying questions based on current conversation
-        clarifying_questions = orchestrator.generate_clarifying_questions(conversation_history)
-        logger.info(f"🤔 {clarifying_questions}\n")
-
-        # Get user response
-        user_response = input("Your response (or say 'start the agent'/'yes'/'run' when ready): ").strip()
-
-        if not user_response:
-            logger.warning("Please provide a response or say when you're ready to start.\n")
-            continue
-
-        # Check for trigger words
-        if any(trigger.lower() in user_response.lower() for trigger in trigger_words):
-            logger.info("\n🚀 Starting the deep research agent workflow...\n")
-            break
-
-        # Add response to conversation history
-        conversation_history.append(user_response)
-        logger.info("")  # Add spacing for readability
-
-    # Run the main workflow with conversation history
-    final_report = orchestrator.run_workflow_from_conversation(conversation_history)  # noqa: F841
+    logger.info("\n🚀 Starting the deep research agent workflow...\n")
+    orchestrator.run_workflow_from_conversation(conversation_history)
 
     logger.info("\n--- END OF WORKFLOW ---")
     logger.info("✅ Your comprehensive research report is ready!")

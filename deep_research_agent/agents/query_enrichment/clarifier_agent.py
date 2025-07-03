@@ -1,7 +1,8 @@
 from strands import Agent
 
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.services.prompt_service import AgentType, PromptService
+from deep_research_agent.common.schemas import AgentType
+from deep_research_agent.services.prompt_service import PromptService
 from deep_research_agent.utils.logger import logger
 
 

@@ -19,5 +19,8 @@
         "**/*.pyc": true,
         ".pytest_cache": true,
         "*.egg-info": true
-    }
+    },
+    "editor.rulers": [
+        119
+    ]
 }
