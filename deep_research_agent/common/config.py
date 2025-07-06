@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     # Bedrock Model IDs
     default_model_id: str = Field(default="us.anthropic.claude-3-7-sonnet-20250219-v1:0", alias="DEFAULT_MODEL_ID")
-    claude_sonnet_model_id: str = Field(
+    claude_3_5_sonnet_model_id: str = Field(
         default="anthropic.claude-3-5-sonnet-20240620-v1:0",
         alias="CLAUDE_SONNET_MODEL_ID",
     )

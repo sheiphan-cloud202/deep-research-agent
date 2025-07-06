@@ -11,10 +11,10 @@ from deep_research_agent.utils.logger import logger
 @tool
 def trend_spotter(query: str, agent: Agent | None = None) -> str:
     """
-    Spots future and emerging tech trends.
+    Identifies emerging trends for a given topic.
 
     Args:
-        query: The search query
+        query: The topic to spot trends for
         agent: Shared Agent instance (if None, creates a new one)
     """
     logger.info(f"Executing Trend Spotter with query: {query}")
@@ -31,18 +31,18 @@ def trend_spotter(query: str, agent: Agent | None = None) -> str:
     # Initialize prompt service to access system and user prompts
     prompt_service = PromptService()
 
-    # Create an agent with the websearch tool and the appropriate system prompt
-    spotter_agent = Agent(
+    # Create a trend-spotting agent with the websearch tool
+    trend_spotter_agent = Agent(
         model=agent.model,
         tools=[websearch],
         system_prompt=prompt_service.get_system_prompt(AgentType.TREND_SPOTTER),
     )
 
-    # Build the user prompt using the template, mapping the query to the expected 'data' placeholder
-    user_prompt = prompt_service.format_user_prompt(AgentType.TREND_SPOTTER, "identify_trends", data=query)
+    # Build the user prompt using the template
+    user_prompt = prompt_service.format_user_prompt(AgentType.TREND_SPOTTER, "spot_trends", topic=query)
 
     # Call the agent and return its response
-    result = spotter_agent(user_prompt)
+    result = trend_spotter_agent(user_prompt)
     return str(result)
 
 
@@ -51,7 +51,7 @@ async def trend_spotter_async(query: str, agent: Agent | None = None) -> str:
     Async version of trend_spotter for parallel execution.
 
     Args:
-        query: The search query
+        query: The topic to spot trends for
         agent: Shared Agent instance (if None, creates a new one)
     """
     # Run the synchronous function in a thread pool to avoid blocking

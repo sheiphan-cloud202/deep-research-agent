@@ -1,30 +1,28 @@
-from strands import Agent
+from typing import Any
 
 from deep_research_agent.agents.base_agent import BaseAgent
+from deep_research_agent.common.config import settings
 from deep_research_agent.common.schemas import AgentType
+from deep_research_agent.core.agent_factory import AgentFactory
 from deep_research_agent.services.prompt_service import PromptService
 from deep_research_agent.utils.logger import logger
 
 
 class ConversationSummarizerAgent(BaseAgent):
-    def __init__(
-        self,
-        prompt_service: PromptService,
-        agent: Agent | None = None,
-        model_id: str | None = None,
-    ):
-        super().__init__(agent, model_id)
-        self.prompt_service = prompt_service
-        self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.CONVERSATION_SUMMARIZER)
+    def __init__(self, prompt_service: PromptService, model_id: str | None = None):
+        super().__init__(prompt_service)
+        self._agent = AgentFactory.create_agent(model_id or settings.claude_3_5_sonnet_model_id)
+        if self.prompt_service:
+            self._agent.system_prompt = self.prompt_service.get_system_prompt(AgentType.CONVERSATION_SUMMARIZER)
 
-    def execute(self, conversation_history: list[str]) -> str:
-        """
-        Summarizes a conversation history into a single paragraph.
-        """
-        logger.info("Executing Conversation Summarizer Agent...")
-        history_str = "\n".join(conversation_history)
-        user_prompt = self.prompt_service.format_user_prompt(
+    def execute(self, context: dict[str, Any]):
+        if not self.prompt_service:
+            raise ValueError("PromptService is not available for ConversationSummarizerAgent")
+
+        history_str = "\n".join(context["conversation_history"])
+        prompt = self.prompt_service.format_user_prompt(
             AgentType.CONVERSATION_SUMMARIZER, "summarize", history_str=history_str
         )
-        result = self._agent(user_prompt)
-        return str(result)  # type: ignore
+        result = self._agent(prompt)
+        context["summary"] = str(result)
+        logger.info(f"Conversation Summary:\n{result}\n")

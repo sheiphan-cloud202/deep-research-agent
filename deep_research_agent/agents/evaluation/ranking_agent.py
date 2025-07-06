@@ -1,39 +1,27 @@
-from strands import Agent
+from typing import Any
 
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.common.schemas import EvaluationScore
 from deep_research_agent.utils.logger import logger
 
 
 class RankingAgent(BaseAgent):
-    def __init__(self, agent: Agent | None = None, model_id: str | None = None):
-        super().__init__(agent, model_id)
-        # This agent performs a deterministic ranking, so the LLM agent is not used,
-        # but we adhere to the BaseAgent pattern.
+    def __init__(self, *args, **kwargs):
+        # This agent does not require prompt_service or a model, so we override __init__
+        super().__init__()
 
-    def execute(self, scored_ideas: dict[str, list[EvaluationScore]]) -> list[dict]:
+    def execute(self, context: dict[str, Any]):
         """
-        Consolidates scores and ranks all refined ideas.
+        Ranks ideas based on their evaluation scores.
         """
         logger.info("Executing Ranking Agent...")
+        scored_ideas = context["scored_ideas"]
 
-        processed_data = []
-        for idea, scores in scored_ideas.items():
-            total_score = sum(item.score for item in scores)
-            avg_score = total_score / len(scores) if scores else 0
-            processed_data.append(
-                {
-                    "idea": idea,
-                    "overall_score": round(avg_score, 2),
-                    "scores": [score.model_dump() for score in scores],  # Convert back to dict for output
-                }
-            )
+        # Simple ranking logic: sum of scores
+        ranked_ideas = sorted(
+            scored_ideas.items(),
+            key=lambda item: sum(score.score for score in item[1]),
+            reverse=True,
+        )
 
-        # Rank based on overall score
-        ranked_list = sorted(processed_data, key=lambda x: x["overall_score"], reverse=True)
-
-        logger.info("Ranked List:")
-        for item in ranked_list:
-            logger.info(f"- {item['idea']} (Overall Score: {item['overall_score']})")
-
-        return ranked_list
+        context["ranked_ideas"] = ranked_ideas
+        logger.info(f"Ranked Ideas:\n{ranked_ideas}\n")

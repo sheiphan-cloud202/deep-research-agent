@@ -32,30 +32,31 @@ SYSTEM_PROMPTS = {
         "Use appropriate tools to format your output."
     ),
     AgentType.USER_PERSONA: (
-        "You are a User Persona Agent. Your job is to create detailed, realistic user personas "
-        "based on a given topic. For the given user groups, create a persona with a name, goals, "
-        "pain points, and technical skills. Present these personas in a clear, readable format. "
-        "Use the websearch tool to find information about the user groups to make the personas more realistic."
+        "You are a User Persona Agent. Your task is to create a detailed user persona based on "
+        "a given topic and industry. Use web search to find relevant information and present it "
+        "in a clear, structured format."
     ),
+    AgentType.PARALLEL_RESEARCH: ("This is a handler for parallel research and does not use a prompt directly."),
 }
 
 # User prompt templates for research agents
 USER_PROMPT_TEMPLATES = {
-    AgentType.BUSINESS_ANALYSIS: {
-        "analyze": "Perform a business analysis and market research on the following topic: {query}"
-    },
     AgentType.SEARCH_SUMMARIZER: {
         "summarize_reports": (
-            "Please synthesize the following research reports and user personas into a "
-            "cohesive 'Creative Brief' in Markdown format:\n\n{reports_str}"
+            "Please synthesize the following research reports into a single, "
+            "cohesive 'Creative Brief' in Markdown format.\n\n"
+            "Reports:\n{reports_str}"
         )
     },
-    AgentType.TREND_SPOTTER: {
-        "identify_trends": "Analyze the following data and identify emerging trends and patterns: {data}"
-    },
+    AgentType.GENERIC_SEARCH: {"search": "Research the following topic: {topic}"},
+    AgentType.BUSINESS_ANALYSIS: {"analyze": "Analyze the business potential of: {query}"},
+    AgentType.DOMAIN_SEARCH: {"search": "Perform a domain-specific search on: {topic}"},
+    AgentType.TREND_SPOTTER: {"spot_trends": "Identify emerging trends for: {topic}"},
     AgentType.USER_PERSONA: {
-        "create_persona": "Based on the following mission, create detailed user personas for the key user groups involved. {user_data}"
+        "create_persona": (
+            "Create a detailed user persona for the following topic and industry.\n"
+            "Topic: {topic}\n"
+            "Industry: {industry}"
+        )
     },
-    AgentType.GENERIC_SEARCH: {"search": "Perform a comprehensive search on the following topic: {topic}"},
-    AgentType.DOMAIN_SEARCH: {"domain_search": "Conduct a specialized search within the {domain} domain for: {query}"},
 }

@@ -1,17 +1,21 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
-from strands import Agent
-
-from deep_research_agent.core.agent_factory import AgentFactory
+from deep_research_agent.services.prompt_service import PromptService
 
 
 class BaseAgent(ABC):
-    def __init__(self, agent: Agent | None = None, model_id: str | None = None):
-        if agent:
-            self._agent = agent
-        else:
-            self._agent = AgentFactory.create_agent(model_id)
+    """Abstract base class for all agents in the system."""
+
+    def __init__(self, prompt_service: PromptService | None = None):
+        self.prompt_service = prompt_service
 
     @abstractmethod
-    def execute(self, *args, **kwargs):
+    def execute(self, context: dict[str, Any]) -> None:
+        """
+        Execute the agent's primary logic.
+
+        This method should read data from the context, perform its operations,
+        and write its output back to the context.
+        """
         pass

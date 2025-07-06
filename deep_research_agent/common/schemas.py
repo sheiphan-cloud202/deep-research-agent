@@ -33,6 +33,7 @@ class AgentType(Enum):
     SEARCH_SUMMARIZER = "search_summarizer"
     TREND_SPOTTER = "trend_spotter"
     USER_PERSONA = "user_persona"
+    PARALLEL_RESEARCH = "parallel_research"
 
 
 class Filters(BaseModel):
