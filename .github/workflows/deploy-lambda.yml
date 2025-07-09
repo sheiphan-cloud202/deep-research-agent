@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:  # Allow manual triggering
 
+# Required for OIDC authentication and for actions/checkout
+permissions:
+  id-token: write
+  contents: read
+
 env:
   LAMBDA_FUNCTION_NAME: deepsearch-qubitz-v1
   AWS_REGION: us-east-1
@@ -27,6 +32,19 @@ jobs:
       uses: astral-sh/setup-uv@v3
       with:
         version: "latest"
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        # Option 1: Using AWS Access Keys (stored in GitHub Secrets)
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+        # Option 2: Using OIDC (uncomment below and comment above for better security)
+        # role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        # role-session-name: GitHubActions-DeployLambda
+        # aws-region: ${{ env.AWS_REGION }}
 
     - name: Install dependencies
       run: |
@@ -67,19 +85,6 @@ jobs:
       run: |
         echo "Packaging application code..."
         zip -r lambda-deployment.zip deep_research_agent/ lambda_function.py
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        # Option 1: Using AWS Access Keys (stored in GitHub Secrets)
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-        # Option 2: Using OIDC (uncomment below and comment above for better security)
-        # role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-        # role-session-name: GitHubActions-DeployLambda
-        # aws-region: ${{ env.AWS_REGION }}
 
     - name: Check if Lambda function exists
       id: check-function
