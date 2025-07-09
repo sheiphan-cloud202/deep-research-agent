@@ -1,5 +1,5 @@
-# Use the official Astral uv image as a builder
-FROM ghcr.io/astral-sh/uv:0.7.20 AS builder
+# Use an official Astral uv image with Python 3.11 as a builder
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim AS builder
 
 # Set up the working directory
 WORKDIR /app
@@ -7,9 +7,12 @@ WORKDIR /app
 # Copy project files
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies into a target directory
+# Export dependencies from the lock file to requirements.txt
+RUN uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
+
+# Install dependencies into a target directory for the Lambda environment
 # This separates dependencies from application code for better Docker layer caching
-RUN uv pip install --system --frozen -r requirements.txt --target /app/packages
+RUN uv pip install --no-cache -r requirements.txt --target /app/packages
 
 # Copy the rest of the application code
 COPY deep_research_agent/ ./deep_research_agent
