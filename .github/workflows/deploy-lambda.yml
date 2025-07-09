@@ -41,7 +41,7 @@ jobs:
         uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
 
         # Install dependencies to deployment directory with Lambda-compatible settings
-        pip install \
+        uv pip install \
           --no-installer-metadata \
           --no-compile-bytecode \
           --target deployment/ \
