@@ -37,9 +37,15 @@ jobs:
         # Create deployment directory
         mkdir -p deployment
 
-        # Install dependencies to deployment directory
-        uv export --all-extras --no-editable --format requirements-txt --output-file requirements.txt
-        pip install -r requirements.txt -t deployment/
+        # Export dependencies excluding workspace and dev dependencies (following UV best practices for Lambda)
+        uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
+
+        # Install dependencies to deployment directory with Lambda-compatible settings
+        pip install \
+          --no-installer-metadata \
+          --no-compile-bytecode \
+          --target deployment/ \
+          -r requirements.txt
 
         # Copy application code
         cp -r deep_research_agent deployment/
