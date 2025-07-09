@@ -32,33 +32,41 @@ jobs:
       run: |
         uv sync --all-extras
 
-    - name: Create deployment package
+    - name: Build and Publish Lambda Layer
+      id: lambda-layer
       run: |
-        # Create deployment directory
-        mkdir -p deployment
-
-        # Export dependencies excluding workspace and dev dependencies (following UV best practices for Lambda)
+        echo "Building dependencies layer..."
         uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
 
-        # Install dependencies to deployment directory with Lambda-compatible settings
+        LAYER_DIR="python"
+
+        # Install dependencies into a `python` directory for the Lambda Layer
         uv pip install \
           --no-installer-metadata \
           --no-compile-bytecode \
-          --target deployment/ \
-          -r requirements.txt
+          --python-platform x86_64-manylinux2014 \
+          --python ${{ env.PYTHON_VERSION }} \
+          -r requirements.txt \
+          --target "${LAYER_DIR}"
 
-        # Copy application code
-        cp -r deep_research_agent deployment/
-        cp lambda_function.py deployment/
+        # Zip the layer content
+        zip -r dependencies-layer.zip "${LAYER_DIR}"
 
-        # Create ZIP file
-        cd deployment
-        zip -r ../lambda-deployment.zip .
-        cd ..
+        echo "Publishing Lambda layer..."
+        LAYER_ARN=$(aws lambda publish-layer-version \
+          --layer-name "${{ env.LAMBDA_FUNCTION_NAME }}-dependencies" \
+          --description "Dependencies for ${{ env.LAMBDA_FUNCTION_NAME }}" \
+          --zip-file fileb://dependencies-layer.zip \
+          --compatible-runtimes "python${{ env.PYTHON_VERSION }}" \
+          --compatible-architectures "x86_64" \
+          --query LayerVersionArn --output text)
 
-        # Check ZIP size (Lambda limit is 50MB for direct upload)
-        echo "ZIP file size:"
-        ls -lh lambda-deployment.zip
+        echo "layer_arn=$LAYER_ARN" >> $GITHUB_OUTPUT
+
+    - name: Build application package
+      run: |
+        echo "Packaging application code..."
+        zip -r lambda-deployment.zip deep_research_agent/ lambda_function.py
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -91,6 +99,7 @@ jobs:
           --role ${{ secrets.LAMBDA_EXECUTION_ROLE_ARN }} \
           --handler lambda_function.lambda_handler \
           --zip-file fileb://lambda-deployment.zip \
+          --layers ${{ steps.lambda-layer.outputs.layer_arn }} \
           --timeout 900 \
           --memory-size 1024 \
           --environment Variables='{
@@ -111,6 +120,7 @@ jobs:
       run: |
         aws lambda update-function-configuration \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+          --layers ${{ steps.lambda-layer.outputs.layer_arn }} \
           --timeout 900 \
           --memory-size 1024 \
           --environment Variables='{
