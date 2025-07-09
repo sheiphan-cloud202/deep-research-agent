@@ -1,0 +1,33 @@
+# Use the official Astral uv image as a builder
+FROM ghcr.io/astral-sh/uv:0.7.20 AS builder
+
+# Set up the working directory
+WORKDIR /app
+
+# Copy project files
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies into a target directory
+# This separates dependencies from application code for better Docker layer caching
+RUN uv pip install --system --frozen -r requirements.txt --target /app/packages
+
+# Copy the rest of the application code
+COPY deep_research_agent/ ./deep_research_agent
+COPY lambda_function.py .
+
+# --- Final Stage ---
+# Use the official AWS Lambda Python base image
+FROM public.ecr.aws/lambda/python:3.11
+
+# Set the working directory in the final image
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+# Copy dependencies from the builder stage
+COPY --from=builder /app/packages ./
+
+# Copy application code from the builder stage
+COPY --from=builder /app/deep_research_agent/ ./deep_research_agent
+COPY --from=builder /app/lambda_function.py .
+
+# Set the command to run the Lambda handler
+CMD [ "lambda_function.lambda_handler" ]

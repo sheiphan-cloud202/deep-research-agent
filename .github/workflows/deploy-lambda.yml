@@ -13,7 +13,7 @@ permissions:
 env:
   LAMBDA_FUNCTION_NAME: deepsearch-qubitz-v1
   AWS_REGION: us-east-1
-  PYTHON_VERSION: "3.11"
+  ECR_REPOSITORY_NAME: deepsearch-qubitz-v1-repo
 
 jobs:
   deploy:
@@ -22,16 +22,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        version: "latest"
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -46,45 +36,24 @@ jobs:
         # role-session-name: GitHubActions-DeployLambda
         # aws-region: ${{ env.AWS_REGION }}
 
-    - name: Install dependencies
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Create ECR repository if it doesn't exist
       run: |
-        uv sync --all-extras
+        aws ecr describe-repositories --repository-names ${{ env.ECR_REPOSITORY_NAME }} >/dev/null 2>&1 || \
+        aws ecr create-repository --repository-name ${{ env.ECR_REPOSITORY_NAME }}
 
-    - name: Build and Publish Lambda Layer
-      id: lambda-layer
+    - name: Build and push Docker image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo "Building dependencies layer..."
-        uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
-
-        LAYER_DIR="python"
-
-        # Install dependencies into a `python` directory for the Lambda Layer
-        uv pip install \
-          --no-installer-metadata \
-          --no-compile-bytecode \
-          --python-platform x86_64-manylinux2014 \
-          --python ${{ env.PYTHON_VERSION }} \
-          -r requirements.txt \
-          --target "${LAYER_DIR}"
-
-        # Zip the layer content
-        zip -r dependencies-layer.zip "${LAYER_DIR}"
-
-        echo "Publishing Lambda layer..."
-        LAYER_ARN=$(aws lambda publish-layer-version \
-          --layer-name "${{ env.LAMBDA_FUNCTION_NAME }}-dependencies" \
-          --description "Dependencies for ${{ env.LAMBDA_FUNCTION_NAME }}" \
-          --zip-file fileb://dependencies-layer.zip \
-          --compatible-runtimes "python${{ env.PYTHON_VERSION }}" \
-          --compatible-architectures "x86_64" \
-          --query LayerVersionArn --output text)
-
-        echo "layer_arn=$LAYER_ARN" >> $GITHUB_OUTPUT
-
-    - name: Build application package
-      run: |
-        echo "Packaging application code..."
-        zip -r lambda-deployment.zip deep_research_agent/ lambda_function.py
+        docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG
+        echo "image_uri=$ECR_REGISTRY/${{ env.ECR_REPOSITORY_NAME }}:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Check if Lambda function exists
       id: check-function
@@ -100,11 +69,9 @@ jobs:
       run: |
         aws lambda create-function \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --runtime python${{ env.PYTHON_VERSION }} \
+          --package-type Image \
+          --code ImageUri=${{ steps.build-image.outputs.image_uri }} \
           --role ${{ secrets.LAMBDA_EXECUTION_ROLE_ARN }} \
-          --handler lambda_function.lambda_handler \
-          --zip-file fileb://lambda-deployment.zip \
-          --layers ${{ steps.lambda-layer.outputs.layer_arn }} \
           --timeout 900 \
           --memory-size 1024 \
           --environment Variables='{
@@ -119,13 +86,13 @@ jobs:
       run: |
         aws lambda update-function-code \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --zip-file fileb://lambda-deployment.zip
+          --image-uri ${{ steps.build-image.outputs.image_uri }}
 
     - name: Update Lambda function configuration
+      if: steps.check-function.outputs.exists == 'true'
       run: |
         aws lambda update-function-configuration \
           --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
-          --layers ${{ steps.lambda-layer.outputs.layer_arn }} \
           --timeout 900 \
           --memory-size 1024 \
           --environment Variables='{
