@@ -17,13 +17,13 @@ class ParallelResearchAgent(BaseAgent):
         # This agent orchestrates other async functions and doesn't need its own prompt service or model
         super().__init__()
 
-    def execute(self, context: dict[str, Any]):
+    async def execute(self, context: dict[str, Any]):
         logger.info("--- Executing Step: Parallel Research ---")
         mission_brief = context.get("mission_brief")
         if not isinstance(mission_brief, MissionBrief):
             raise TypeError("Mission brief must be of type MissionBrief")
 
-        research_results = asyncio.run(self._run_research_agents_parallel(mission_brief))
+        research_results = await self._run_research_agents_parallel(mission_brief)
         context["research_results"] = research_results
 
     async def _run_research_agents_parallel(self, mission_brief: MissionBrief):

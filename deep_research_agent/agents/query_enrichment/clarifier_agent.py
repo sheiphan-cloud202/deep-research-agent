@@ -1,7 +1,7 @@
 from typing import Any
 
 from deep_research_agent.agents.base_agent import BaseAgent
-from deep_research_agent.common.schemas import AgentType
+from deep_research_agent.common.schemas import AgentType, AwaitingUserInputError
 from deep_research_agent.core.agent_factory import AgentFactory
 from deep_research_agent.services.prompt_service import PromptService
 from deep_research_agent.utils.logger import logger
@@ -23,36 +23,32 @@ class ClarifierAgent(BaseAgent):
             logger.warning("ClarifierAgent expects 'conversation_history' in the context, but it was empty.")
             return
 
-        trigger_words = ["start the agent", "yes", "run", "start agent", "begin", "go"]
+        trigger_words = [
+            "start the agent",
+            "yes",
+            "run",
+            "start agent",
+            "begin",
+            "go",
+        ]
+        latest_user_response = conversation_history[-1]
+
+        if any(trigger.lower() in latest_user_response.lower() for trigger in trigger_words):
+            logger.info("\n✅ Great! Moving to the next step...\n")
+            return
+
         logger.info("\n💭 Let me ask you some clarifying questions to better understand your idea...\n")
 
-        while True:
-            latest_context = conversation_history[-1]
-            full_context = "\n".join(conversation_history)
+        latest_context = conversation_history[-1]
+        full_context = "\n".join(conversation_history)
 
-            # Generate questions using the correct prompt template
-            prompt = self.prompt_service.format_user_prompt(
-                AgentType.CLARIFIER,
-                "interactive",
-                latest_context=latest_context,
-                full_context=full_context,
-            )
-            clarifying_questions = self._agent(prompt)
-            logger.info(f"🤔 {clarifying_questions}\n")
+        prompt = self.prompt_service.format_user_prompt(
+            AgentType.CLARIFIER,
+            "interactive",
+            latest_context=latest_context,
+            full_context=full_context,
+        )
+        clarifying_questions = self._agent(prompt)
+        logger.info(f"🤔 {clarifying_questions}\n")
 
-            # Get user response
-            user_response = input("Your response (or say 'start the agent'/'yes'/'run' when ready): ").strip()
-
-            if not user_response:
-                logger.warning("Please provide a response or say when you're ready to start.\n")
-                continue
-
-            conversation_history.append(user_response)
-
-            if any(trigger.lower() in user_response.lower() for trigger in trigger_words):
-                logger.info("\n✅ Great! Moving to the next step...\n")
-                break
-
-            logger.info("")
-
-        context["conversation_history"] = conversation_history
+        raise AwaitingUserInputError(str(clarifying_questions))

@@ -15,6 +15,8 @@ class Settings(BaseSettings):
         alias="CLAUDE_SONNET_MODEL_ID",
     )
 
+    deepseek_llm_r1_0528: str = Field(default="deepseek-llm-r1-0528", alias="DEEPSEEK_R1_MODEL_ID")
+
     # Boto3 Client Configuration
     boto_connect_timeout: int = Field(default=900, alias="BOTO_CONNECT_TIMEOUT")
     boto_read_timeout: int = Field(default=900, alias="BOTO_READ_TIMEOUT")

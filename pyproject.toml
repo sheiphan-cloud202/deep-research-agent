@@ -17,6 +17,7 @@ dependencies = [
 
 [project.scripts]
 start = "deep_research_agent.main:main"
+start-api = "deep_research_agent.api.runner:start"
 
 [project.optional-dependencies]
 dev = [
@@ -33,6 +34,11 @@ test = [
     "moto[boto3]>=4.2.0",
     "responses>=0.24.0",
     "freezegun>=1.4.0",
+]
+api = [
+    "fastapi>=0.116.0",
+    "uvicorn[standard]>=0.35.0",
+    "mangum>=0.18.0",
 ]
 
 [tool.setuptools]

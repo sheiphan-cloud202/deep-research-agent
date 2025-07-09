@@ -3,37 +3,56 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
-class AgentType(Enum):
-    """Enumeration of all agent types in the system"""
-
-    # Evaluation agents
-    ETHICAL_GUARDIAN = "ethical_guardian"
-    EVALUATION_COORDINATOR = "evaluation_coordinator"
-    MARKET_VIABILITY = "market_viability"
-    RANKING = "ranking"
-    TECHNICAL_FEASIBILITY = "technical_feasibility"
-
-    # Ideation agents
-    DEVILS_ADVOCATE = "devils_advocate"
-    IDEATION = "ideation"
-
-    # Query enrichment agents
-    CLARIFIER = "clarifier"
+class AgentType(str, Enum):
+    # Query Enrichment
     CONVERSATION_SUMMARIZER = "conversation_summarizer"
-    QUERY_ENHANCER = "query_enhancer"
     QUERY_UNDERSTANDING = "query_understanding"
+    QUERY_ENHANCER = "query_enhancer"
+    CLARIFIER = "clarifier"
 
-    # Reporting agents
-    REPORT_SYNTHESIZER = "report_synthesizer"
+    # Ideation
+    IDEATION = "ideation"
+    DEVILS_ADVOCATE = "devils_advocate"
 
-    # Research agents
-    BUSINESS_ANALYSIS = "business_analysis"
+    # Research
     DOMAIN_SEARCH = "domain_search"
     GENERIC_SEARCH = "generic_search"
-    SEARCH_SUMMARIZER = "search_summarizer"
-    TREND_SPOTTER = "trend_spotter"
+    BUSINESS_ANALYSIS = "business_analysis"
     USER_PERSONA = "user_persona"
+    TREND_SPOTTER = "trend_spotter"
+    SEARCH_SUMMARIZER = "search_summarizer"
     PARALLEL_RESEARCH = "parallel_research"
+
+    # Evaluation
+    TECHNICAL_FEASIBILITY = "technical_feasibility"
+    MARKET_VIABILITY = "market_viability"
+    ETHICAL_GUARDIAN = "ethical_guardian"
+    RANKING = "ranking"
+    EVALUATION_COORDINATOR = "evaluation_coordinator"
+
+    # Reporting
+    REPORT_SYNTHESIZER = "report_synthesizer"
+
+
+class SearchResult(BaseModel):
+    title: str
+    url: str
+    snippet: str
+    content: str | None = None
+    source: str
+
+
+class TrendResult(BaseModel):
+    trend_name: str
+    description: str
+    search_volume: str
+    related_topics: list[str]
+
+
+class AwaitingUserInputError(Exception):
+    def __init__(self, questions: str):
+        self.questions = questions
+        super().__init__(questions)
 
 
 class Filters(BaseModel):
