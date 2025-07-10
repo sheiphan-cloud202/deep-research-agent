@@ -7,16 +7,13 @@ WORKDIR /app
 # Copy project definition files
 COPY pyproject.toml uv.lock ./
 
-# Create an empty directory for the local package.
-# This is necessary because `uv` with a `pyproject.toml` present
-# expects the package directory to exist, even if we're not installing it yet.
-# We create it empty to avoid busting the cache on code changes.
+# Create the package directory so uv can find the project. This is needed by `uv sync`.
 RUN mkdir -p deep_research_agent
 
-# Install third-party dependencies into a target directory for the Lambda environment
-# We use `uv pip install .` to have `uv` resolve dependencies from `pyproject.toml` and `uv.lock`,
-# but we exclude the project itself with `--exclude .` to only install third-party packages.
-RUN uv pip install --no-cache --target /app/packages -e . --exclude .
+# Install all dependencies from pyproject.toml (including all extras) into a virtual environment.
+# We use --no-install-project to prevent installing the local deep-research-agent package itself,
+# allowing us to cache the third-party dependency layer separately from the application code.
+RUN uv sync --all-extras --no-install-project
 
 # Copy the rest of the application code
 COPY deep_research_agent/ ./deep_research_agent
@@ -29,8 +26,9 @@ FROM public.ecr.aws/lambda/python:3.11
 # Set the working directory in the final image
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Copy dependencies from the builder stage
-COPY --from=builder /app/packages ./
+# Copy dependencies from the builder stage's virtual environment.
+# This copies the contents of site-packages directly into the Lambda runtime's path.
+COPY --from=builder /app/.venv/lib/python3.11/site-packages/ .
 
 # Copy application code from the builder stage
 COPY --from=builder /app/deep_research_agent/ ./deep_research_agent
