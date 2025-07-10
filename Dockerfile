@@ -4,19 +4,19 @@ FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim AS builder
 # Set up the working directory
 WORKDIR /app
 
-# Copy project files
-COPY pyproject.toml uv.lock README.md ./
+# Copy project definition files
+COPY pyproject.toml uv.lock ./
 
-# Export dependencies from the lock file to requirements.txt
-RUN uv export --frozen --no-dev --no-editable --all-extras -o requirements.txt
-
-# Remove the local package from the requirements file. This allows us to cache
-# the installation of third-party dependencies in a separate Docker layer.
-# Local packages are identified by 'file:///' in the requirements.txt.
-RUN grep -v "file:///" requirements.txt > requirements.tmp && mv requirements.tmp requirements.txt
+# Create an empty directory for the local package.
+# This is necessary because `uv` with a `pyproject.toml` present
+# expects the package directory to exist, even if we're not installing it yet.
+# We create it empty to avoid busting the cache on code changes.
+RUN mkdir -p deep_research_agent
 
 # Install third-party dependencies into a target directory for the Lambda environment
-RUN uv pip install --no-cache -r requirements.txt --target /app/packages
+# We use `uv pip install .` to have `uv` resolve dependencies from `pyproject.toml` and `uv.lock`,
+# but we exclude the project itself with `--exclude .` to only install third-party packages.
+RUN uv pip install --no-cache --target /app/packages -e . --exclude .
 
 # Copy the rest of the application code
 COPY deep_research_agent/ ./deep_research_agent
