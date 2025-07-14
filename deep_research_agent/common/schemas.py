@@ -4,6 +4,9 @@ from pydantic import BaseModel, Field
 
 
 class AgentType(str, Enum):
+    # Document Processing
+    DOCUMENT_SUMMARIZER = "document_summarizer"
+
     # Query Enrichment
     CONVERSATION_SUMMARIZER = "conversation_summarizer"
     QUERY_UNDERSTANDING = "query_understanding"
@@ -82,30 +85,22 @@ class EvaluationScore(BaseModel):
 
 
 class UseCase(BaseModel):
-    name: str = Field(..., description="The name of the use case.")
+    id: str = Field(..., description="A unique identifier for the use case.")
+    title: str = Field(..., description="The title of the use case.")
     description: str = Field(..., description="A detailed description of the use case.")
-    area: str = Field(..., description="The business area or department it belongs to.")
-    category: str = Field(
-        ...,
-        description="The category of the use case (e.g., Customer Service, Operations).",
+    business_value: str = Field(..., description="The business value and impact of the use case.")
+    technical_requirements: list[str] = Field(
+        default_factory=list, description="List of technical requirements and technologies."
     )
-    priority: int = Field(..., ge=1, le=5, description="The priority of the use case (1-5).")
-    impact_score: int = Field(..., ge=1, le=10, description="The potential impact of the use case (1-10).")
-    implementation_complexity: str = Field(..., description="The complexity of implementing the use case.")
-    alignment_score: int = Field(
-        ...,
-        ge=1,
-        le=10,
-        description="How well the use case aligns with business goals (1-10).",
-    )
-    business_value: str = Field(..., description="The business value proposition.")
-    estimated_roi: str = Field(..., description="The estimated return on investment.")
-    key_benefits: list[str] = Field(..., description="A list of key benefits.")
-    success_metrics: list[str] = Field(..., description="Metrics to measure success.")
-    prerequisites: list[str] = Field(..., description="Prerequisites for implementation.")
-    estimated_timeline: str = Field(..., description="An estimated timeline for implementation.")
-    risk_factors: list[str] = Field(..., description="Potential risks and mitigation strategies.")
-    technologies_used: list[str] = Field(..., description="A list of technologies required.")
+    priority: str = Field(default="Medium", description="The priority level (e.g., Critical, High, Medium, Low).")
+    complexity: str = Field(default="Medium", description="The implementation complexity (e.g., High, Medium, Low).")
+    citations: list[str] = Field(default_factory=list, description="List of sources or research citations.")
+    aws_services: list[str] = Field(default_factory=list, description="List of AWS services required.")
+    implementation_approach: str = Field(default="", description="Implementation approach description.")
+    estimated_timeline: str = Field(default="", description="Timeline estimate.")
+    cost_estimate: str = Field(default="", description="Cost estimate.")
+    current_implementation: str = Field(default="", description="Current implementation status.")
+    proposed_solution: str = Field(default="", description="Proposed solution description.")
 
 
 class UseCases(BaseModel):

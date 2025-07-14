@@ -28,7 +28,7 @@ class EvaluationCoordinatorAgent(BaseAgent):
             raise ValueError("PromptService is not available for EvaluationCoordinatorAgent")
 
         refined_ideas = cast(UseCases, context["initial_ideas"])
-        idea_list = [f"{i.name}: {i.description}" for i in refined_ideas.use_cases]
+        idea_list = [f"{i.title}: {i.description}" for i in refined_ideas.use_cases]
         result = self.execute_agent(idea_list)
         context["scored_ideas"] = result
 

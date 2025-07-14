@@ -22,9 +22,11 @@ def user_persona_agent(mission_brief: MissionBrief, agent: Agent | None = None) 
     if agent is None:
         from strands.models import BedrockModel
 
+        from deep_research_agent.common.config import settings
+
         model = BedrockModel(
-            model_id="us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-            region_name="us-east-1",
+            model_id="anthropic.claude-3-sonnet-20240229-v1:0",
+            region_name=settings.aws_region,
         )
         agent = Agent(model=model)
 

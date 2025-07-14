@@ -2,6 +2,7 @@ from deep_research_agent.common.schemas import AgentType
 
 # Define the default workflow by listing the agent types in execution order
 DEFAULT_WORKFLOW = [
+    AgentType.DOCUMENT_SUMMARIZER,
     AgentType.CLARIFIER,
     AgentType.CONVERSATION_SUMMARIZER,
     AgentType.QUERY_ENHANCER,
@@ -18,6 +19,7 @@ DEFAULT_WORKFLOW = [
 
 # Example of a simpler workflow that could be used for different purposes
 SIMPLE_WORKFLOW = [
+    AgentType.DOCUMENT_SUMMARIZER,
     AgentType.CLARIFIER,
     AgentType.CONVERSATION_SUMMARIZER,
     AgentType.QUERY_ENHANCER,

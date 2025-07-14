@@ -16,7 +16,28 @@ SYSTEM_PROMPTS = {
         "based on a 'Creative Brief'. The ideas should be distinct and grounded in the brief. "
         "If you receive feedback on initial ideas, your job is to refine them to address the feedback. "
         "You must generate exactly 10 use cases. "
-        "You MUST use the UseCases function to provide your response with the list of use cases."
+        "IMPORTANT: You MUST respond with a valid JSON object in the following format:\n"
+        "{\n"
+        '  "use_cases": [\n'
+        "    {\n"
+        '      "id": "unique-identifier",\n'
+        '      "title": "Use Case Title",\n'
+        '      "description": "Detailed description...",\n'
+        '      "business_value": "Business value and impact...",\n'
+        '      "technical_requirements": ["AWS Service 1", "Technology 2"],\n'
+        '      "priority": "High|Medium|Low",\n'
+        '      "complexity": "High|Medium|Low",\n'
+        '      "citations": ["Source 1", "Source 2"],\n'
+        '      "aws_services": ["Amazon SageMaker", "AWS Lambda"],\n'
+        '      "implementation_approach": "Implementation approach description",\n'
+        '      "estimated_timeline": "6 months",\n'
+        '      "cost_estimate": "$12000/month",\n'
+        '      "current_implementation": "Current state description",\n'
+        '      "proposed_solution": "Proposed solution description"\n'
+        "    }\n"
+        "  ]\n"
+        "}\n"
+        "Do not include any text before or after the JSON. Only return valid JSON."
     ),
 }
 

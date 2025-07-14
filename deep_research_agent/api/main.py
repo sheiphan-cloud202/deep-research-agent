@@ -15,7 +15,7 @@ class StartRequest(BaseModel):
     company_name: str
     company_url: str
     action: str
-    uploaded_files: list[str] = []
+    uploaded_files: list[str] = []  # S3 URLs or local file paths
 
 
 class ConversationResponse(BaseModel):
@@ -41,6 +41,11 @@ async def start_research(request: StartRequest):
     orchestrator = conversation_manager.get_conversation(conversation_id)
     if not orchestrator:
         raise HTTPException(status_code=500, detail="Failed to create conversation")
+
+    # Add uploaded files to the workflow context if any are provided
+    if request.uploaded_files:
+        orchestrator.workflow_context["uploaded_files"] = request.uploaded_files
+
     try:
         result = await orchestrator.start_workflow(initial_prompt)
         # This path should not be hit if ClarifierAgent is first

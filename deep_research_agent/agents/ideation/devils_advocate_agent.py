@@ -20,7 +20,7 @@ class DevilsAdvocateAgent(BaseAgent):
             raise ValueError("PromptService is not available for DevilsAdvocateAgent")
 
         initial_ideas = cast(UseCases, context["initial_ideas"])
-        idea_list = [f"- {i.name}: {i.description}" for i in initial_ideas.use_cases]
+        idea_list = [f"- {i.title}: {i.description}" for i in initial_ideas.use_cases]
         ideas_str = "\n".join(idea_list)
 
         prompt = self.prompt_service.format_user_prompt(AgentType.DEVILS_ADVOCATE, "critique", ideas_str=ideas_str)

@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from deep_research_agent.agents.base_agent import BaseAgent
@@ -33,21 +34,58 @@ class ClarifierAgent(BaseAgent):
         ]
         latest_user_response = conversation_history[-1]
 
-        if any(trigger.lower() in latest_user_response.lower() for trigger in trigger_words):
+        # Use regex with word boundaries to avoid matching substrings within words (e.g., "go" in "governance")
+        if any(
+            re.search(r"\b" + re.escape(trigger) + r"\b", latest_user_response, re.IGNORECASE)
+            for trigger in trigger_words
+        ):
             logger.info("\n✅ Great! Moving to the next step...\n")
             return
 
         logger.info("\n💭 Let me ask you some clarifying questions to better understand your idea...\n")
 
-        latest_context = conversation_history[-1]
-        full_context = "\n".join(conversation_history)
+        # Check if there are document summaries in the context
+        document_summaries = context.get("document_summaries", [])
 
-        prompt = self.prompt_service.format_user_prompt(
-            AgentType.CLARIFIER,
-            "interactive",
-            latest_context=latest_context,
-            full_context=full_context,
-        )
+        if document_summaries:
+            # Use document-aware clarifying questions
+            logger.info("📄 I've analyzed your uploaded documents. Let me ask some targeted questions...\n")
+
+            # Extract original request (before document analysis was added)
+            original_request = (
+                conversation_history[0].split("\n\nDocument Analysis:")[0]
+                if "Document Analysis:" in conversation_history[0]
+                else conversation_history[0]
+            )
+
+            # Get consolidated document summary
+            document_summary = ""
+            if len(document_summaries) == 1:
+                document_summary = document_summaries[0]["summary"]
+            else:
+                # Multiple documents - create a brief overview
+                document_summary = "\n\n".join(
+                    [f"File: {doc['file_name']}\nSummary: {doc['summary'][:300]}..." for doc in document_summaries]
+                )
+
+            prompt = self.prompt_service.format_user_prompt(
+                AgentType.CLARIFIER,
+                "with_documents",
+                initial_request=original_request,
+                document_summary=document_summary,
+            )
+        else:
+            # Use regular clarifying questions
+            latest_context = conversation_history[-1]
+            full_context = "\n".join(conversation_history)
+
+            prompt = self.prompt_service.format_user_prompt(
+                AgentType.CLARIFIER,
+                "interactive",
+                latest_context=latest_context,
+                full_context=full_context,
+            )
+
         clarifying_questions = self._agent(prompt)
         logger.info(f"🤔 {clarifying_questions}\n")
 

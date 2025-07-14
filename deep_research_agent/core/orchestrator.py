@@ -15,7 +15,10 @@ class OrchestratorAgent:
         self.current_step = 0
 
     async def start_workflow(self, initial_prompt: str):
-        self.workflow_context = {"conversation_history": [initial_prompt]}
+        # Preserve existing context (like uploaded_files) and add conversation history
+        if not hasattr(self, "workflow_context") or self.workflow_context is None:
+            self.workflow_context = {}
+        self.workflow_context["conversation_history"] = [initial_prompt]
         self.current_step = 0
         return await self.run_next_step()
 

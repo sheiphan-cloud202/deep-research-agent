@@ -5,8 +5,10 @@ This module provides the entry point for deploying the FastAPI application
 to AWS Lambda using Mangum as the ASGI-to-Lambda adapter.
 """
 
+import json
 import logging
 import os
+from typing import Any
 
 from mangum import Mangum
 
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 handler = Mangum(app, lifespan="off")
 
 
-def lambda_handler(event, context):
+def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     """
     AWS Lambda handler function.
 
@@ -37,19 +39,35 @@ def lambda_handler(event, context):
         dict: HTTP response in Lambda proxy integration format
     """
 
-    # Log request information for debugging
-    logger.info(f"Received event: {event.get('httpMethod', 'Unknown')} {event.get('path', 'Unknown')}")
-
-    # Set any additional environment variables or configurations specific to Lambda
-    # This is useful for distinguishing between local development and Lambda execution
-    os.environ.setdefault("LAMBDA_EXECUTION", "true")
-
     try:
+        # Log request information for debugging
+        method = event.get("httpMethod", "Unknown")
+        path = event.get("path", "Unknown")
+        logger.info(f"Received event: {method} {path}")
+
+        # Set any additional environment variables or configurations specific to Lambda
+        # This is useful for distinguishing between local development and Lambda execution
+        os.environ.setdefault("LAMBDA_EXECUTION", "true")
+
         # Call the Mangum handler which will process the FastAPI app
         response = handler(event, context)
 
+        # Ensure CORS headers are present
+        if "headers" not in response:
+            response["headers"] = {}
+
+        response["headers"].update(
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+                "Content-Type": "application/json",
+            }
+        )
+
         # Log successful response
-        logger.info(f"Successfully processed request, status: {response.get('statusCode', 'Unknown')}")
+        status_code = response.get("statusCode", "Unknown")
+        logger.info(f"Successfully processed request, status: {status_code}")
 
         return response
 
@@ -57,7 +75,7 @@ def lambda_handler(event, context):
         # Log errors for CloudWatch debugging
         logger.error(f"Error processing request: {str(e)}", exc_info=True)
 
-        # Return a proper error response
+        # Return a proper error response following the reference pattern
         return {
             "statusCode": 500,
             "headers": {
@@ -66,5 +84,5 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
                 "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
             },
-            "body": '{"error": "Internal server error"}',
+            "body": json.dumps({"error": "Internal server error", "message": str(e)}),
         }
