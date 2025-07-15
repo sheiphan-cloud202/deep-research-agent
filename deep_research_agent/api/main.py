@@ -67,6 +67,6 @@ async def respond(conversation_id: str, response: ConversationResponse):
         result = await orchestrator.continue_workflow(response.response)
         if result.get("status") == "completed":
             conversation_manager.end_conversation(conversation_id)
-        return {"status": "completed", "result": result}
+        return {"status": "use_cases_generated", "result": result}
     except AwaitingUserInputError as e:
         return {"status": "awaiting_input", "questions": e.questions}

@@ -16,28 +16,29 @@ SYSTEM_PROMPTS = {
         "based on a 'Creative Brief'. The ideas should be distinct and grounded in the brief. "
         "If you receive feedback on initial ideas, your job is to refine them to address the feedback. "
         "You must generate exactly 10 use cases. "
-        "IMPORTANT: You MUST respond with a valid JSON object in the following format:\n"
+        "IMPORTANT: Keep descriptions and explanations concise (1-2 sentences max per field). "
+        "You MUST respond with a valid JSON object in the following format:\n"
         "{\n"
         '  "use_cases": [\n'
         "    {\n"
-        '      "id": "unique-identifier",\n'
+        '      "id": "uc-1",\n'
         '      "title": "Use Case Title",\n'
-        '      "description": "Detailed description...",\n'
-        '      "business_value": "Business value and impact...",\n'
-        '      "technical_requirements": ["AWS Service 1", "Technology 2"],\n'
-        '      "priority": "High|Medium|Low",\n'
-        '      "complexity": "High|Medium|Low",\n'
-        '      "citations": ["Source 1", "Source 2"],\n'
-        '      "aws_services": ["Amazon SageMaker", "AWS Lambda"],\n'
-        '      "implementation_approach": "Implementation approach description",\n'
+        '      "description": "Brief description (1-2 sentences)",\n'
+        '      "business_value": "Concise business value statement",\n'
+        '      "technical_requirements": ["Service1", "Service2"],\n'
+        '      "priority": "High",\n'
+        '      "complexity": "Medium",\n'
+        '      "citations": ["URL1"],\n'
+        '      "aws_services": ["SageMaker", "Lambda"],\n'
+        '      "implementation_approach": "Brief approach description",\n'
         '      "estimated_timeline": "6 months",\n'
-        '      "cost_estimate": "$12000/month",\n'
-        '      "current_implementation": "Current state description",\n'
-        '      "proposed_solution": "Proposed solution description"\n'
+        '      "cost_estimate": "$50k/month",\n'
+        '      "current_implementation": "Current state",\n'
+        '      "proposed_solution": "Proposed solution summary"\n'
         "    }\n"
         "  ]\n"
         "}\n"
-        "Do not include any text before or after the JSON. Only return valid JSON."
+        "Do not include any text before or after the JSON. Only return valid JSON. Keep each field concise."
     ),
 }
 

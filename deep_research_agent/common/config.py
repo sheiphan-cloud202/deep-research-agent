@@ -21,5 +21,8 @@ class Settings(BaseSettings):
     boto_connect_timeout: int = Field(default=900, alias="BOTO_CONNECT_TIMEOUT")
     boto_read_timeout: int = Field(default=900, alias="BOTO_READ_TIMEOUT")
 
+    # Serper API Key
+    serper_api_key: str = Field(default="", alias="SERPER_API_KEY")
+
 
 settings = Settings()

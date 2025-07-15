@@ -51,14 +51,59 @@ class IdeationAgent(BaseAgent):
     def _parse_json_to_usecases(self, response_text: str) -> UseCases:
         """Parse the agent's text response and convert it to UseCases object."""
         try:
+            # Clean the response text and remove any markdown formatting
+            cleaned_text = response_text.strip()
+            if cleaned_text.startswith("```json"):
+                cleaned_text = cleaned_text[7:]
+            if cleaned_text.endswith("```"):
+                cleaned_text = cleaned_text[:-3]
+            cleaned_text = cleaned_text.strip()
+
             # Try to extract JSON from the response
-            json_match = re.search(r"\{.*\}", response_text, re.DOTALL)
+            json_match = re.search(r"\{.*\}", cleaned_text, re.DOTALL)
             if json_match:
                 json_text = json_match.group()
+
+                # Try to fix incomplete JSON by adding missing closing braces/brackets
+                open_braces = json_text.count("{")
+                close_braces = json_text.count("}")
+                open_brackets = json_text.count("[")
+                close_brackets = json_text.count("]")
+
+                # If JSON is incomplete, try to complete it
+                if open_braces > close_braces or open_brackets > close_brackets:
+                    logger.warning("Detected incomplete JSON, attempting to fix...")
+
+                    # Find the last complete use case
+                    use_case_pattern = r'"id":\s*"[^"]*"'
+                    matches = list(re.finditer(use_case_pattern, json_text))
+
+                    if matches and len(matches) > 1:
+                        # Find the position after the last complete use case
+                        last_complete_match = matches[-2]  # Take second-to-last to be safe
+
+                        # Find the end of that use case object
+                        search_from = last_complete_match.end()
+                        brace_count = 0
+                        end_pos = search_from
+
+                        for i, char in enumerate(json_text[search_from:]):
+                            if char == "{":
+                                brace_count += 1
+                            elif char == "}":
+                                brace_count -= 1
+                                if brace_count == 0:
+                                    end_pos = search_from + i + 1
+                                    break
+
+                        # Truncate to the last complete use case and close the JSON
+                        json_text = json_text[:end_pos] + "]}"
+                        logger.info("Truncated JSON to last complete use case")
+
                 data = json.loads(json_text)
             else:
                 # If no JSON found, try to parse the entire response
-                data = json.loads(response_text)
+                data = json.loads(cleaned_text)
 
             # Handle different possible JSON structures
             if isinstance(data, dict):
@@ -80,7 +125,27 @@ class IdeationAgent(BaseAgent):
 
         except (json.JSONDecodeError, ValueError, KeyError) as e:
             logger.error(f"Failed to parse JSON response: {e}")
-            logger.error(f"Response text: {response_text}")
+            logger.error(f"Response text (first 1000 chars): {response_text[:1000]}")
+
+            # Try one more time with a more aggressive approach - extract individual use cases
+            try:
+                use_cases_list = []
+                # Look for individual use case objects
+                use_case_objects = re.findall(r'\{[^{}]*"id":[^{}]*\}', response_text, re.DOTALL)
+
+                for uc_text in use_case_objects:
+                    try:
+                        uc_data = json.loads(uc_text)
+                        use_cases_list.append(UseCase.model_validate(uc_data))
+                    except:  # noqa: E722
+                        continue
+
+                if use_cases_list:
+                    logger.info(f"Recovered {len(use_cases_list)} use cases from malformed JSON")
+                    return UseCases(use_cases=use_cases_list)
+
+            except Exception as fallback_error:
+                logger.error(f"Fallback parsing also failed: {fallback_error}")
 
         # Fallback: create a default structure if parsing fails
         logger.warning("Failed to parse response, creating default structure")

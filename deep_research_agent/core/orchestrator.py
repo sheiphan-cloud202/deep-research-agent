@@ -28,12 +28,12 @@ class OrchestratorAgent:
 
     async def run_next_step(self):
         if self.current_step >= len(self.workflow):
-            final_report = self.workflow_context.get(
-                "final_report", "Workflow finished, but no final report was generated."
-            )
+            # Get use cases from ideation agent (initial_ideas or refined_ideas)
+            use_cases = self.workflow_context.get("refined_ideas") or self.workflow_context.get("initial_ideas")
+            serialized_use_cases = self._serialize_use_cases(use_cases)
             logger.info("\n--- END OF WORKFLOW ---")
-            logger.info(f"Final Report:\n{final_report}")
-            return {"status": "completed", "report": final_report}
+            logger.info(f"Use Cases from Ideation Agent:\n{use_cases}")
+            return {"use_cases": serialized_use_cases}
 
         agent_type = self.workflow[self.current_step]
         await self._execute_step(agent_type)
@@ -50,12 +50,12 @@ class OrchestratorAgent:
         for step in self.workflow:
             await self._execute_step(step)
 
-        final_report = self.workflow_context.get(
-            "final_report", "Workflow finished, but no final report was generated."
-        )
+        # Get use cases from ideation agent (initial_ideas or refined_ideas)
+        use_cases = self.workflow_context.get("refined_ideas") or self.workflow_context.get("initial_ideas")
+        serialized_use_cases = self._serialize_use_cases(use_cases)
         logger.info("\n--- END OF WORKFLOW ---")
-        logger.info(f"Final Report:\n{final_report}")
-        return final_report
+        logger.info(f"Use Cases from Ideation Agent:\n{use_cases}")
+        return serialized_use_cases
 
     async def _execute_step(self, agent_type: AgentType):
         logger.info(f"--- Executing Step: {agent_type.value} ---")
@@ -79,3 +79,21 @@ class OrchestratorAgent:
             await agent_instance.execute(self.workflow_context)
         else:
             agent_instance.execute(self.workflow_context)
+
+    def _serialize_use_cases(self, use_cases):
+        """
+        Serialize use cases from ideation agent for JSON response.
+        Converts UseCases object to JSON-serializable format.
+        """
+        if not use_cases:
+            return []
+
+        if hasattr(use_cases, "model_dump"):
+            # UseCases object with model_dump method
+            return use_cases.model_dump()["use_cases"]
+        elif hasattr(use_cases, "use_cases"):
+            # UseCases object without model_dump
+            return [uc.model_dump() if hasattr(uc, "model_dump") else uc for uc in use_cases.use_cases]
+        else:
+            # Fallback for other formats
+            return use_cases

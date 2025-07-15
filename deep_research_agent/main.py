@@ -21,7 +21,10 @@ def main():
     orchestrator = OrchestratorAgent()
 
     logger.info("\n🚀 Starting the deep research agent workflow...\n")
-    orchestrator.run_workflow_from_conversation(conversation_history)
+    # Ensure the async function is awaited properly
+    import asyncio
+
+    asyncio.run(orchestrator.run_workflow_from_conversation(conversation_history))
 
     logger.info("\n--- END OF WORKFLOW ---")
     logger.info("✅ Your comprehensive research report is ready!")
