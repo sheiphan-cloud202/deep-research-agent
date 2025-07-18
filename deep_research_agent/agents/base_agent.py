@@ -1,21 +1,28 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from deep_research_agent.services.prompt_service import PromptService
+if TYPE_CHECKING:
+    from deep_research_agent.services.prompt_service import PromptService
 
 
 class BaseAgent(ABC):
     """Abstract base class for all agents in the system."""
 
-    def __init__(self, prompt_service: PromptService | None = None):
+    def __init__(self, prompt_service: "PromptService | None" = None):
+        """
+        Initialize the base agent.
+
+        Args:
+            prompt_service: Optional service for retrieving prompts
+        """
         self.prompt_service = prompt_service
 
     @abstractmethod
-    def execute(self, context: dict[str, Any]) -> None:
+    def execute(self, context: dict[str, Any]):
         """
-        Execute the agent's primary logic.
+        Execute the agent's main functionality.
 
-        This method should read data from the context, perform its operations,
-        and write its output back to the context.
+        Args:
+            context: Shared context dictionary containing workflow data
         """
         pass

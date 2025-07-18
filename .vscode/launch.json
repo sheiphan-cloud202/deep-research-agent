@@ -9,7 +9,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
             },
             "args": [],
             "stopOnEntry": false,
@@ -24,11 +25,29 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
             },
             "args": [],
             "stopOnEntry": false,
             "justMyCode": false,
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Debug Deep Research Agent (with Mock Input)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/deep_research_agent/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1",
+                "DEBUG_MODE": "true"
+            },
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": true,
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
@@ -39,7 +58,59 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
+            },
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": true,
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Debug Orchestrator Only",
+            "type": "python",
+            "request": "launch",
+            "module": "deep_research_agent.core.orchestrator",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
+            },
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": true,
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Debug Script (No User Input)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug_main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1",
+                "DEBUG_MODE": "true"
+            },
+            "args": [],
+            "stopOnEntry": false,
+            "justMyCode": true,
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Debug Single Agent",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/debug_main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1",
+                "DEBUG_MODE": "true",
+                "DEBUG_AGENT": "CLARIFIER"
             },
             "args": [],
             "stopOnEntry": false,

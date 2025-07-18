@@ -35,6 +35,7 @@ class AgentType(str, Enum):
 
     # Reporting
     REPORT_SYNTHESIZER = "report_synthesizer"
+    CITATION_REPORT_GENERATOR = "citation_report_generator"
 
 
 class SearchResult(BaseModel):

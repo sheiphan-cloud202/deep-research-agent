@@ -1,37 +1,5 @@
-{
-  "test_root_endpoint": {
-    "httpMethod": "GET",
-    "path": "/",
-    "queryStringParameters": null,
-    "headers": {
-      "accept": "application/json",
-      "accept-encoding": "gzip, deflate",
-      "host": "your-api-id.execute-api.us-east-1.amazonaws.com",
-      "user-agent": "aws-lambda-test",
-      "x-amzn-trace-id": "Root=1-ffffffff-ffffffffffffffffffffffff",
-      "x-forwarded-for": "127.0.0.1",
-      "x-forwarded-port": "443",
-      "x-forwarded-proto": "https"
-    },
-    "body": null,
-    "isBase64Encoded": false,
-    "requestContext": {
-      "httpMethod": "GET",
-      "path": "/",
-      "resourcePath": "/",
-      "accountId": "123456789012",
-      "apiId": "your-api-id",
-      "stage": "test",
-      "requestId": "test-request-1",
-      "identity": {
-        "sourceIp": "127.0.0.1"
-      }
-    },
-    "resource": "/",
-    "pathParameters": null,
-    "stageVariables": null
-  },
-  "test_research_endpoint": {
+[
+  {
     "httpMethod": "POST",
     "path": "/research",
     "queryStringParameters": null,
@@ -39,100 +7,7 @@
       "accept": "application/json",
       "accept-encoding": "gzip, deflate",
       "content-type": "application/json",
-      "host": "your-api-id.execute-api.us-east-1.amazonaws.com",
-      "user-agent": "aws-lambda-test",
-      "x-amzn-trace-id": "Root=1-ffffffff-ffffffffffffffffffffffff",
-      "x-forwarded-for": "127.0.0.1",
-      "x-forwarded-port": "443",
-      "x-forwarded-proto": "https"
-    },
-    "body": "{\"company_name\": \"Test Company\", \"company_url\": \"https://example.com\", \"action\": \"start\", \"uploaded_files\": []}",
-    "isBase64Encoded": false,
-    "requestContext": {
-      "httpMethod": "POST",
-      "path": "/research",
-      "resourcePath": "/research",
-      "accountId": "123456789012",
-      "apiId": "your-api-id",
-      "stage": "test",
-      "requestId": "test-request-2",
-      "identity": {
-        "sourceIp": "127.0.0.1"
-      }
-    },
-    "resource": "/research",
-    "pathParameters": null,
-    "stageVariables": null
-  },
-  "test_options_request": {
-    "httpMethod": "OPTIONS",
-    "path": "/research",
-    "queryStringParameters": null,
-    "headers": {
-      "access-control-request-headers": "content-type",
-      "access-control-request-method": "POST",
-      "host": "your-api-id.execute-api.us-east-1.amazonaws.com",
-      "origin": "https://your-frontend-domain.com",
-      "user-agent": "aws-lambda-test"
-    },
-    "body": null,
-    "isBase64Encoded": false,
-    "requestContext": {
-      "httpMethod": "OPTIONS",
-      "path": "/research",
-      "resourcePath": "/research",
-      "accountId": "123456789012",
-      "apiId": "your-api-id",
-      "stage": "test",
-      "requestId": "test-request-3",
-      "identity": {
-        "sourceIp": "127.0.0.1"
-      }
-    },
-    "resource": "/research",
-    "pathParameters": null,
-    "stageVariables": null
-  },
-  "test_conversation_response": {
-    "httpMethod": "POST",
-    "path": "/research/test-conversation-id/respond",
-    "queryStringParameters": null,
-    "headers": {
-      "accept": "application/json",
-      "accept-encoding": "gzip, deflate",
-      "content-type": "application/json",
-      "host": "your-api-id.execute-api.us-east-1.amazonaws.com",
-      "user-agent": "aws-lambda-test"
-    },
-    "body": "{\"response\": \"Yes, the company focuses on AI technology solutions.\"}",
-    "isBase64Encoded": false,
-    "requestContext": {
-      "httpMethod": "POST",
-      "path": "/research/test-conversation-id/respond",
-      "resourcePath": "/research/{conversation_id}/respond",
-      "accountId": "123456789012",
-      "apiId": "your-api-id",
-      "stage": "test",
-      "requestId": "test-request-4",
-      "identity": {
-        "sourceIp": "127.0.0.1"
-      }
-    },
-    "resource": "/research/{conversation_id}/respond",
-    "pathParameters": {
-      "conversation_id": "test-conversation-id"
-    },
-    "stageVariables": null
-  },
-  "test_full_research_flow": {
-    "httpMethod": "POST",
-    "path": "/research",
-    "queryStringParameters": null,
-    "headers": {
-      "accept": "application/json",
-      "accept-encoding": "gzip, deflate",
-      "content-type": "application/json",
-      "host": "your-api-id.execute-api.eu-west-2.amazonaws.com",
+      "host": "ec2-user@ec2-18-170-97-69.eu-west-2.compute.amazonaws.com",
       "user-agent": "aws-lambda-test"
     },
     "body": "{\"company_name\": \"Zomato\", \"company_url\": \"https://www.zomato.com\", \"action\": \"start\", \"uploaded_files\": []}",
@@ -152,5 +27,36 @@
     "resource": "/research",
     "pathParameters": null,
     "stageVariables": null
+  },
+  {
+    "httpMethod": "POST",
+    "path": "/research/1b46862d-b39a-492f-b828-fedcab6f8abd/respond",
+    "queryStringParameters": null,
+    "headers": {
+      "accept": "application/json",
+      "accept-encoding": "gzip, deflate",
+      "content-type": "application/json",
+      "host": "ec2-user@ec2-18-170-97-69.eu-west-2.compute.amazonaws.com",
+      "user-agent": "aws-lambda-test"
+    },
+    "body": "{\"response\": \"Yes, the company focuses on AI technology solutions.\"}",
+    "isBase64Encoded": false,
+    "requestContext": {
+      "httpMethod": "POST",
+      "path": "/research/1b46862d-b39a-492f-b828-fedcab6f8abd/respond",
+      "resourcePath": "/research/{conversation_id}/respond",
+      "accountId": "123456789012",
+      "apiId": "your-api-id",
+      "stage": "test",
+      "requestId": "test-request-4",
+      "identity": {
+        "sourceIp": "127.0.0.1"
+      }
+    },
+    "resource": "/research/{conversation_id}/respond",
+    "pathParameters": {
+      "conversation_id": "1b46862d-b39a-492f-b828-fedcab6f8abd"
+    },
+    "stageVariables": null
   }
-}
+]

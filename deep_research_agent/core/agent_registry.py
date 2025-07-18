@@ -7,6 +7,7 @@ from deep_research_agent.agents.query_enrichment.conversation_summarizer_agent i
 from deep_research_agent.agents.query_enrichment.document_summarizer_agent import DocumentSummarizerAgent
 from deep_research_agent.agents.query_enrichment.query_enhancer_agent import QueryEnhancerAgent
 from deep_research_agent.agents.query_enrichment.query_understanding_agent import QueryUnderstandingAgent
+from deep_research_agent.agents.reporting.citation_report_generator_agent import CitationReportGeneratorAgent
 from deep_research_agent.agents.reporting.report_synthesizer_agent import ReportSynthesizerAgent
 from deep_research_agent.agents.research.parallel_research_agent import ParallelResearchAgent
 from deep_research_agent.agents.research.search_summarizer_agent import SearchSummarizerAgent
@@ -25,4 +26,5 @@ AGENT_REGISTRY = {
     AgentType.EVALUATION_COORDINATOR: EvaluationCoordinatorAgent,
     AgentType.RANKING: RankingAgent,
     AgentType.REPORT_SYNTHESIZER: ReportSynthesizerAgent,
+    AgentType.CITATION_REPORT_GENERATOR: CitationReportGeneratorAgent,
 }
